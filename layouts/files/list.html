@@ -1,0 +1,15 @@
+{{ define "main" }}
+<div id="_list">
+    <h1>/files</h1>
+    <ul id="list">
+        {{ range (.Pages).ByDate.Reverse }}
+        <li>
+            <div class="item">
+                <a href="{{ .Permalink }}">{{ .Title }}</a>
+                <span class="date">/{{ .Date.Format "January 9 2006" }}</span>
+            </div>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+{{ end }}

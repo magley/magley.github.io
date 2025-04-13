@@ -1,0 +1,17 @@
+{{ define "main" }}
+<div id="_single">
+    <h1>/files</h1>
+    <h2>{{ .Params.Title }}</h2>
+    <span class="date">
+        Posted on {{ .Date.Format "January 2, 2006" }}
+    </span>
+    <hr />
+
+    {{ .Content }}
+
+
+    <div id="return">
+        <a href="/files">Return to files</a>
+    </div>
+</div>
+{{ end }}

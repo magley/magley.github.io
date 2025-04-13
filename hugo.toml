@@ -1,0 +1,16 @@
+baseURL = 'https://magley.github.io/'
+languageCode = 'en-us'
+title = "magley's website"
+
+[params]
+title = "magley's website"
+
+
+[markup]
+[markup.highlight]
+style = 'onesenterprise'
+linenos = true
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
