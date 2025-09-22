@@ -1,6 +1,8 @@
 {{ define "main" }}
 <div id="_list">
-    <h1>/files</h1>
+    <a href="/files">
+        <h1>Files</h1>
+    </a>
     <ul id="list">
         {{ range (.Pages).ByDate.Reverse }}
         <li>

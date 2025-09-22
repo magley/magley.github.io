@@ -1,6 +1,8 @@
 {{ define "main" }}
 <div id="_single">
-    <h1>/blog</h1>
+    <a href="/posts">
+        <h1>Blog</h1>
+    </a>
     <h2>{{ .Params.Title }}</h2>
     <div class="date">
         Posted on {{ .Date.Format "January 2, 2006" }}

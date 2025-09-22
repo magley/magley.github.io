@@ -1,11 +1,20 @@
+html {
+    height: 100%;
+    background: linear-gradient(#aaa, #fff) repeat-x bottom left white;
+
+}
+
 body {
     margin: 0;
-    background-color: #F9FAFB;
+
 
     #inner {
-        width: 40em;
+        width: 50em;
         margin: 0 auto;
         font-family: Verdana, sans-serif;
+        background: white;
+        padding: 2em;
+        box-shadow: black;
     }
 }
 
@@ -19,13 +28,29 @@ a {
     text-decoration: underline;
 }
 
+nav {
+    background: #aaa
+}
+
 nav ul {
     list-style: none;
-    padding: 3px 0px;
+    padding: 0px 0px;
+    margin-left: 1em;
+    border-left: 2px solid white;
 
     li {
         display: inline;
-        margin-right: 0.25em;
+        border-right: 2px solid white;
+    }
+
+    a {
+        color: white;
+        text-decoration: none;
+        padding: 0 1em;
+    }
+
+    a:hover {
+        text-decoration: underline;
     }
 }
 
@@ -37,20 +62,21 @@ footer {
 }
 
 #header-title {
-    font-weight: 100;
-}
-
-h1 {
-    font-weight: 100;
-    font-style: italic;
+    font-weight: bolder;
     font-family: serif;
+    color: rgb(44, 107, 255);
+    font-size: 3em;
 }
 
 h1 {
     font-size: 2.25em;
     margin-bottom: 0.2em;
-    font-weight: 100;
     font-family: serif;
+}
+
+.highlight {
+    background: #fbfbfb;
+    outline: 1px solid gray;
 }
 
 #_list {
