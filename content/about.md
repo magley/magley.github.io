@@ -2,16 +2,9 @@
 title: About
 ---
 
-# /about
-
-## Website
+# [About](/about)
 
 - powered by [Hugo](https://gohugo.io/)
-- hosted with Github Pages
-- source code is [here](https://github.com/magley/magley.github.io)
-- made without AI
-
-## Contact
-
-- my github is [magley](https://github.com/magley)
-- my email is "magleymail at gmail.com"
+- [open source](https://github.com/magley/magley.github.io)
+- [github](https://github.com/magley)
+- [email](mailto:magleymail@gmail.com)

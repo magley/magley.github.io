@@ -2,6 +2,6 @@
 title: Home
 ---
 
-# /home
+# [Home](/)
 
 This website is under perpetual construction.
