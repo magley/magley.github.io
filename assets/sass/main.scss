@@ -51,6 +51,10 @@ nav ul {
     a:hover {
         text-decoration: underline;
     }
+
+    li.active a {
+        text-decoration: underline;
+    }
 }
 
 footer {
@@ -71,6 +75,14 @@ h1 {
     font-size: 2.25em;
     margin-bottom: 0.2em;
     font-family: serif;
+}
+
+h2 {
+    margin-bottom: 0em !important;
+}
+
+.desc {
+    margin-left: 1em;
 }
 
 .highlight {

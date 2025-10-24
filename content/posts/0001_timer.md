@@ -1,8 +1,7 @@
 ---
-title: Immediate mode timer in game engines
-desc: A surprisingly useful thing no game engine does right
+title: Immediate mode timer in games
+desc: A surprisingly useful thing game engines do wrong
 date: 2025-10-23
-draft: true
 ---
 
 Quick: how do you perform some code in your game after a certain amount of time?
@@ -84,7 +83,7 @@ do this at this time, let the engine take care of the rest".
 
 I propose a different solution, inspired by immediate mode graphics libraries.
 The big idea is for you (your class, your component, your node, whatever) to own the timer,
-to update the timer and to query the timer:
+to update the timer and to query the timer _explicitly_:
 
 ```c++
 struct Timer {
@@ -241,9 +240,9 @@ isn't any point to address it either, it's just a matter of implementation.
 
 ---
 
-Callbacks are a "don't call us -- we'll call you" type of deal. I truly believe
-using callbacks for something as primitive as a timer, which in games and game
-engines should _de facto_ be a primitive data type, is wrong.
+Callbacks are a "don't call us -- we'll call you" type of deal. Using callbacks
+for something like a timer, which in games and game engines should
+_de facto_ be a primitive data type, is wrong.
 
 Whenever I start a new project in Unity or Godot, the first thing I do is create
 a custom Timer class like the one above. You may not feel convinced at first,

@@ -9,6 +9,9 @@
             <div class="item">
                 <a href="{{ .Permalink }}">{{ .Title }}</a>
                 <span class="date">/{{ .Date.Format "Jan 02, 2006" }}</span>
+                {{ with .Params.desc }}
+                <br /> <small class="desc">{{ . }}</small>
+                {{ end }}
             </div>
         </li>
         {{ end }}

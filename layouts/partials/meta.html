@@ -1,5 +1,13 @@
 <meta charset="utf-8">
-<title>{{ .Page.Title }}</title>
+
+<title>
+    {{ if .IsHome }}
+    {{ .Site.Title }}
+    {{ else }}
+    {{ .Title }} | {{ .Site.Title }}
+    {{ end }}
+</title>
+
 {{ $style := resources.Get "sass/main.scss" | css.Sass | resources.Minify }}
 <link rel="stylesheet" href="{{ $style.Permalink }}">
 

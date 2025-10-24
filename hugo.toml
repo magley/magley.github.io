@@ -1,9 +1,9 @@
 baseURL = 'https://magley.github.io/'
 languageCode = 'en-us'
-title = "magley's website"
+title = "magley"
 
 [params]
-title = "magley's website"
+title = "magley"
 
 
 [markup]
@@ -14,3 +14,24 @@ linenos = true
 [caches]
   [caches.images]
     dir = ':cacheDir/images'
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+
+  [[menu.main]]
+    name = "Blog"
+    url = "/posts/"
+    weight = 2
+
+  [[menu.main]]
+    name = "Files"
+    url = "/files/"
+    weight = 3
+
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 4

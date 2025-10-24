@@ -1,8 +1,9 @@
 <nav>
     <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/posts/">Blog</a></li>
-        <li><a href="/files/">Files</a></li>
-        <li><a href="/about/">About</a></li>
+        {{ range .Site.Menus.main }}
+        <li class="{{ if eq $.RelPermalink .URL }}active{{ end }}">
+            <a href="{{ .URL }}">{{ .Name }}</a>
+        </li>
+        {{ end }}
     </ul>
 </nav>

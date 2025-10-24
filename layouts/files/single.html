@@ -4,9 +4,14 @@
         <h1>Files</h1>
     </a>
     <h2>{{ .Params.Title }}</h2>
+    {{ with .Params.desc }}
+    <small>{{ . }}</small>
+    {{ end }}
+    <br /><br />
     <span class="date">
         Posted on {{ .Date.Format "January 2, 2006" }}
     </span>
+
     <hr />
 
     {{ .Content }}

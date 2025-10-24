@@ -4,6 +4,10 @@
         <h1>Blog</h1>
     </a>
     <h2>{{ .Params.Title }}</h2>
+    {{ with .Params.desc }}
+    <small>{{ . }}</small>
+    {{ end }}
+    <br /><br />
     <div class="date">
         Posted on {{ .Date.Format "January 2, 2006" }}
     </div>
@@ -12,7 +16,7 @@
     {{ .Content }}
 
     <div id="return">
-        <a href="/posts">Return to posts</a>
+        <a href="/posts">Return to blog</a>
     </div>
 </div>
 {{ end }}

@@ -1,3 +1,3 @@
 ---
-title: files
+title: Files
 ---
