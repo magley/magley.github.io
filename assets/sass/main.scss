@@ -132,3 +132,56 @@ h2 {
     padding: 0.15em 0.45em;
     border-radius: 1em;
 }
+
+@media (prefers-color-scheme: dark) {
+    html {
+        background: linear-gradient(#0f0f0f, #313131) repeat-x bottom left white;
+    }
+
+    body {
+        background-color: #313131;
+
+        #inner {
+            background: #494949;
+            box-shadow: black;
+            color: rgb(223, 223, 223);
+        }
+    }
+
+    a {
+        color: rgb(58, 191, 252);
+    }
+
+    nav {
+        background: #0f0f0f;
+    }
+
+    nav ul {
+        border-left-color: rgb(223, 223, 223);
+
+        li {
+            border-right-color: rgb(223, 223, 223);
+        }
+
+        a {
+            color: rgb(223, 223, 223);
+        }
+    }
+
+    footer {
+        background: #f2f2f2;
+    }
+
+    #header-title {
+        color: rgb(58, 191, 252);
+    }
+
+    .highlight {
+        background: #fbfbfb;
+        outline-color: gray;
+    }
+
+    .tag {
+        background-color: lightgray;
+    }
+}

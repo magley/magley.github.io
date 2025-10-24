@@ -236,7 +236,7 @@ struct Timer {
 ```
 
 I know I haven't actually provided an answer to this counterargument, but there
-isn't any point to address it either, it's just a matter of implementation.
+isn't any point to address either, it's just a matter of implementation.
 
 ---
 

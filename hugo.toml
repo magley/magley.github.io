@@ -3,12 +3,12 @@ languageCode = 'en-us'
 title = "magley"
 
 [params]
-title = "magley"
+title = "magley's website"
 
 
 [markup]
 [markup.highlight]
-style = 'onesenterprise'
+noClasses = false
 linenos = true
 
 [caches]

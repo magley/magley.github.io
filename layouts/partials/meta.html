@@ -11,6 +11,9 @@
 {{ $style := resources.Get "sass/main.scss" | css.Sass | resources.Minify }}
 <link rel="stylesheet" href="{{ $style.Permalink }}">
 
+<link rel="stylesheet" href="/css/onesenterprise.css" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/dracula.css" media="(prefers-color-scheme: dark)">
+
 {{ if .Params.math }}
 {{ partial "katex.html" . }}
 {{ end }}
