@@ -7,7 +7,7 @@ date: 2025-10-23
 Quick: how do you perform some code in your game after a certain amount of time?
 Well, that depends on the game engine you use.
 
-In Unity, you use Coroutines.
+- In Unity, you use Coroutines.
 
 ```C#
 private bool canGetHit = true;
@@ -24,7 +24,7 @@ IEnumerator BecomeInvincible(float time) {
 }
 ```
 
-In Godot, you use the Timer node.
+- In Godot, you use the Timer node.
 
 ```gdscript
 var can_get_hit: bool = true
@@ -44,7 +44,7 @@ func _on_invicible_timer_timeout():
 	can_get_hit = true
 ```
 
-In Unreal Engine 5, there's the TimerManager:
+- In Unreal Engine 5, there's the TimerManager:
 
 ```c++
 /// .h
@@ -71,19 +71,24 @@ void MyActor::OnInvincibilityTimerEnd() {
 }
 ```
 
-In GameMaker, you use Alarms or Time Sources and so on and so on.
+- In GameMaker, you use Alarms or Time Sources and so on and so on.
 
-The one thing in common between all these approaches are _callbacks_.
+The one thing in common between all these approaches is the usage _callbacks_.
 
-You create a timer, tell it to go off in _this many_ seconds or frames and you tell it
-which function to invoke when the timer goes off. It's a declarative approach of "I want to
-do this at this time, let the engine take care of the rest".
+You create a timer, tell it to go off in _this many_ seconds or frames and you
+tell it which function to invoke when the timer goes off. It's a declarative
+approach of "I want to do this at this time, let the engine take care of the
+rest". It's easy and it works.
 
 ---
 
+I don't like it though. The timers are handled by the engine so they enter
+automagical territory. If you ever need finer control between timers, you are at
+the mercy of the engine's API to grant you such control.
+
 I propose a different solution, inspired by immediate mode graphics libraries.
-The big idea is for you (your class, your component, your node, whatever) to own the timer,
-to update the timer and to query the timer _explicitly_:
+The big idea is for you (your class, your component, your node, whatever) to own
+the timer, to update the timer and to query the timer _explicitly_:
 
 ```c++
 struct Timer {
@@ -117,7 +122,7 @@ struct Timer {
 And then you use it like this (pseudo-engine):
 
 ```c++
-Timer invincibility_timer = Timer()
+Timer invincibility_timer = Timer(5.0f);
 bool can_get_hit = true;
 
 void update() {
@@ -179,10 +184,11 @@ screwed. Good luck debugging that.
 
 With an explicit timer, you know exactly when the timer ticks, when the timer
 goes off, how different timers interact, nesting timers makes sense because the
-inner timer is conditional on the outer timers and so on.
+inner timer is conditional on the outer timers and so on. This is especially
+handy when debugging: the timer ticking is part of your script. 
 
-**(3)** -- The caveats of my usage example are many, and my proposed timer API
-may not be everyone's cup of tea, but the primary idea is:
+**(3)** -- Yes, the caveats of my usage example are many, and my proposed timer
+API may not be everyone's cup of tea, but the primary idea is:
 
 ```c++
 if (timer.update(Game::delta_time)) {
@@ -236,13 +242,20 @@ struct Timer {
 ```
 
 I know I haven't actually provided an answer to this counterargument, but there
-isn't any point to address either, it's just a matter of implementation.
+isn't any point to address either, it's just a matter of implementation. Anything
+you could ever expect a timer to do can be done using this method.
 
 ---
 
 Callbacks are a "don't call us -- we'll call you" type of deal. Using callbacks
 for something like a timer, which in games and game engines should
 _de facto_ be a primitive data type, is wrong.
+
+The nice thing about this approach to timers is that you could discover it
+yourself by accident out of ignorance. If you're too lazy to read the game
+engine's manual to do timers in an idiomatic way, you'd implement an ad hoc
+version of this timer using a single `float`. It's a mere one layer of
+abstraction away from becoming a common utility in your game code.
 
 Whenever I start a new project in Unity or Godot, the first thing I do is create
 a custom Timer class like the one above. You may not feel convinced at first,
