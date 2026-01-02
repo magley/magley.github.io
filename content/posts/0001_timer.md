@@ -35,13 +35,13 @@ func on_get_hit():
 
 
 func become_invincible(time: float):
-	can_get_hit = false
-	var timer = get_tree().create_timer(time)
+    can_get_hit = false
+    var timer = get_tree().create_timer(time)
     timer.timeout.connect(_on_timer_timeout)
 
 
 func _on_invicible_timer_timeout():
-	can_get_hit = true
+    can_get_hit = true
 ```
 
 - In Unreal Engine 5, there's the TimerManager:
@@ -73,7 +73,7 @@ void MyActor::OnInvincibilityTimerEnd() {
 
 - In GameMaker, you use Alarms or Time Sources and so on and so on.
 
-The one thing in common between all these approaches is the usage _callbacks_.
+The one thing in common between all these approaches is the usage of _callbacks_.
 
 You create a timer, tell it to go off in _this many_ seconds or frames and you
 tell it which function to invoke when the timer goes off. It's a declarative

@@ -1,7 +1,15 @@
-<!-- {{ with .Params.hide_footer }}
+{{ with .Params.hide_footer }}
 {{ else }}
+<hr/>
 <footer>
-    Website by <a href="https://github.com/magley">magley</a>
-    • Powered by <a href="https://gohugo.io/">Hugo</a>
+    <p>
+        Website by <a href="https://github.com/magley">magley</a>
+    </p>
+    <p>
+        © 2025–{{ dateFormat "2006" now }} magley
+    </p>
+    <p>
+        Powered by <a href="https://gohugo.io/">Hugo</a>
+    </p>
 </footer>
-{{ end }} -->
+{{ end }}
