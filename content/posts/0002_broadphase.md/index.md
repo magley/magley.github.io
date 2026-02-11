@@ -64,7 +64,7 @@ talk about unordered pairs $\\{e_1, e_2\\}$.
 
 We know ahead of time which entity pairs can be elements of the resulting set.
 Any entity can be paired up against any other entity (except for itself), so if
-we have $n$ entities, the total number of possible pairs is $n \choose 2$.
+we have $n$ entities, the total number of possible pairs is \binom{n}{2}$.
 
 It's important to establish the concept of _bounding volumes_. Take a look at
 the image below. If every entity in the scene is a star, then checking for star
@@ -94,4 +94,47 @@ more efficient for shapes with a similar span in both axes, otherwise ellipses
 can be used. However, the strategies discussed in this article mostly deal with
 the very edge of an entity's volume in the $x$ or $y$ axis, and so it seems
 natural to go with rectangles.
+
+## Naive approach
+
+The simplest solution to this problem is to iterate through all possible pairs
+of entities and check if their bounding volumes intersect. This approach scales
+poorly: we perform $\binom{n}{2}$ comparisons in $O(n^2)$ time. Despite its poor
+performance, this brute force approach can be used as a baseline for checking
+the correctness of other strategies.
+
+To develop an intuition on how we can improve on this, take a look at the image
+below. Can you see how the rectangles have been placed in such a way that they
+naturally form two big clusters?
+
+<img src="./clustered_rectangles.png" width="300"/> 
+
+It seems obvious that no rectangle from the left cluser can intersect with any
+rectangle from the right cluster. What if we processed these clusters
+separately? There are $7$ rectangles in the first cluster and $8$ in the second.
+It would take $\binom{7}{2} + \binom{8}{2} = 49$ checks, compared to the
+standard $\binom{15}{2} = 105$.
+
+To obtain these clusters, we'd sort the rectangles along the $x$ axis and draw a
+line between the two adjacent rectangles with the furthest distance along the
+$x$ axis. Sometimes it may be better to split along the $y$ axis instead. We can
+determine the better axis in linear time by computing the variance along each
+axis. In an ideal case, this amounts to $n\log(n) + \frac{n^2}{2}$. That's
+$O(n^2)$, sure, but look at this graph:
+
+<img src="./graph_naivesplit.png" width="800"/>
+
+In a realistic and practical scenario, the number of entities in a game will not
+approach anywhere near infinity. If we had $5000$ entities, we would save
+approx. $2 \cdot 10^7$ comparisons. That's a non-trivial amount. While $N=5000$
+is good enough for games, if we're scanning through a database with millions of
+entries, the gains diminish fast. We cannot always discard the theoretical limit
+in favor of the practical limit. Furthermore, there are two big issues with this
+approach in general.
+
+1) it doesn't work if the rectangles don't form two disjoint clusters
+2) it doesn't work if the clusters are unbalanced
+
+By finding a smarter and more general approach to grouping likely candidates,
+these two problems can be eliminated.
 
