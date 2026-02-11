@@ -5,6 +5,8 @@ title = "magley"
 [params]
 title = "magley's website"
 
+[markup.goldmark.renderer]
+unsafe = true # Allow html in .md
 
 [markup]
 [markup.highlight]
