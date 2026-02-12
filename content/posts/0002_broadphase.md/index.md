@@ -17,7 +17,7 @@ real world data, and so we need to find a way to quickly prune false negatives
 or group potential candidates together. I will cover some of these solution in
 this article.
 
-## Metric spaces 
+### Metric spaces 
 
 We are all adults here so let's formalize things.
 A _metric space_ is a set of objects $M$, which can be anything,
@@ -44,7 +44,7 @@ function itself may be.
 This article will deal with the Euclidean space because it's primarilly written
 for game engines and because it's easy and intuitive to visualize.
 
-## Problem formulation
+### Problem formulation
 
 Let _entity_ be a type representing an object in two-dimensional Euclidean space
 with a volume larger than $0$. I've picked two dimensions for simplicity. Having
@@ -95,7 +95,7 @@ can be used. However, the strategies discussed in this article mostly deal with
 the very edge of an entity's volume in the $x$ or $y$ axis, and so it seems
 natural to go with rectangles.
 
-## Naive approach
+### Naive approach
 
 The simplest solution to this problem is to iterate through all possible pairs
 of entities and check if their bounding volumes intersect. This approach scales
@@ -138,3 +138,53 @@ approach in general.
 By finding a smarter and more general approach to grouping likely candidates,
 these two problems can be eliminated.
 
+### Sweep and prune
+
+Sweep and prune (a.k.a. sort and sweep) is a classic algorithm for broad phase
+collision detection. It works by sorting the bounding volumes and pruning all
+candidates which are guaranteed not to intersect.
+
+I will first describe a weaker algorithm from which sweep and prune can then be
+developed. The basis for this algorithm is the same as sweep and prune. First,
+we sort all the objects (bounding volumes) along one of the axes. For
+illustration purposes I'll stick with the $x$ axis. Then, for each object, we
+find the lower bound right edge and upper bound left edge volume. Everything in
+between those two is a collision candidate for our object. Seems simple enough,
+but we need to be careful on how to sort the objects and how to find the bounds.
+
+For example, let's have an arrangement of objects like in the image below. We
+have sort the objects on the x axis according to some modification of the metric
+function $d^\prime : M \to \mathbb{R}$. In this example, I've used the $x$
+coordinate of the object's left edge. Below the objects is an axis line where
+you can clearly see the projection of the left edge. The numbers represent
+ordering of the objects, not axis units.
+
+<img src="./sweep_and_prune_pseudo.png" width="520"/>
+
+The second part of the algorithm is to find candidates for each object. Observe
+the 6th object which has been highlighted in the image. In the brute force approach,
+we scan through the entire set of objects. This time around, we can take advantage
+of the fact that the objects are sorted by their left edge. 
+
+When we sort things, an invariant is established: if a number $k$ is the $i$-th
+element of the list, then all elements to the right (at position $i+1, i+2, ...,
+n$) are greater or equal than $k$, and all elements to the left (at position
+$i-1, i-2, ..., 1$) are smaller or equal than $k$. This is the basis for binary
+search and this is what we use to quickly find the upper bound. 
+
+What is the upper bound in our example? It's the first object whose left edge is
+bigger than the 6th object's right edge (9). We use binary search to find this
+object in $O(logn)$.
+
+What about the lower bound? It's the first object whose right edge is smaller
+than the 6th object's left edge (3). We can't do binary search here because the
+invariant doesn't guarantee anything about the right edge of objects being
+ordered. We have two options: sort by the right edge as well, or do a linear
+scan for the lower bound. The first approach is tricky, while the second
+approach decays into $O(n)$.
+
+Once we find the upper and lower bound, everything in between is a candidate for
+middle phase collision (check which rectangles are really intersecting) and
+narrow phase collision (use the actual shapes instead of bounding volumes). The
+running time of this pseudo-sweep and prune algorithm is still $O(n^2)$, but the
+average case yields better performance than the naive approach.
