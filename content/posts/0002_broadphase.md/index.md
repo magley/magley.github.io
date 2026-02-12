@@ -187,4 +187,67 @@ Once we find the upper and lower bound, everything in between is a candidate for
 middle phase collision (check which rectangles are really intersecting) and
 narrow phase collision (use the actual shapes instead of bounding volumes). The
 running time of this pseudo-sweep and prune algorithm is still $O(n^2)$, but the
-average case yields better performance than the naive approach.
+average case yields better performance than the naive approach. Furthermore,
+if we can assume temporal coherence (more on that below), then the amortized runtime
+can be reduced to $\mathcal{O}(nlogn)$.
+
+---
+
+Now let's look at the real sweep and prune algorithm. The key idea behind sweep
+and prune is not to sort objects by their left or right edge, but to sort both
+edges together. 
+
+Let's solve a simpler, more isolated problem first. Imagine you are given a
+string `s` where each character is either an opening bracket `[` or a closing
+one `]`. An interval is uniquely defined by an opening bracket and a closing
+bracket. Find all intersections between intervals. For example, if `s` is
+`[[]][[][]][]` then there are $3$ intersections. <br/>
+Firstly, observe that the answer is unique assuming `s` is well formed. Even in
+cases like `[[]]` where we could either have a large interval enclosing a
+smaller one, or two equaly sized intervals intersecting, the answer stays the
+same. This problem is solved using a stack. We linearly scan through the string
+and on each occurrence of `[`, we increase the result by the stack size and push
+`[` onto the stack. On each occurrence of `]`, we pop from the stack.
+
+The next iteration of this problem requires us to retrieve all intersections.
+Each interval is numbered $1, 2, 3, ...$ and the algorithm should output a list
+of pairs $(i, j), i < j$. Notice first that we must be provided with the
+interval ordering or else the solution cannot be unique. Indeed, the input is
+`[[][]]` has different possible solutions: $\\{(1,2), (1,3)\\}, \\{(1,2),
+(2,3)\\}$. So let's assume that the input is a list of pairs `(char, int)`. To
+solve this problem, we keep a stack of integers denoting unclosed intervals
+scanned so far, and on each `('[', k)`, we append `(k_i, k)` to the result,
+where `k_i` is the $i$-th element of the stack. This is the optimal solution to
+this problem and it has a worst-case running time of $O(n^2)$, though on average
+it's $O(n)$.
+
+Sweep and prune generalizes this approach. Let edge be a triple 
+$(x, v, c) | x\in \mathbb{R}, v \in \mathbb{N}, c \in \\{0,1\\}$ 
+representing the edge's coordinate $x$, a unique identifier for 
+the volume or object $v$ which the edge belongs to, and a boolean 
+$c$ for the edge is opening (lower, leftmost, $0$) or closing 
+(upper, rightmost, $1$). We create a list of edges by mapping
+each object into two of these edge tuples. Then, we sort the list 
+by $x$ and perform the algorithm described above.
+
+See the image below. Time time we aren't querying each object individually, and
+instead we're doing a linear pass through the list and generating all results at
+once.
+
+<img src="./sweep_and_prune.png" width="800"/>
+
+The performance of sweep and prune is $O(nlogn + k)$ where $k$ is the maximum
+number of pairs. In the worst case it's $\binom{n}{2}$, but the worst case is
+almost never occurs, and $k$ is usually $O(n)$, so the running time is
+approximated to $O(nlogn)$. This can be further improved. A lot of processing
+time is wasted on sorting the array at each invocation of the algorithm. Think
+about temporal coherence: between two calls of the algorithm (usually two
+adjacent frames in a game), the objects will not move much far because their
+velocities are usually much smaller than the perimiter of their bounding
+volumes. Therefore, the sorted list will not change much. In other words, we can
+assume the list will remain partially sorted, and thus we should use an adaptive
+sorting algorithms like insertion sort, which have a $O(n)$ running time for
+partially ordered lists. We can't always rely on this, especially on the very
+first frame, but if temporal coherence is assumed (which is the case in most
+video games), then the amortized running time for sweep and prune is
+$\mathcal{O}(n)$.
