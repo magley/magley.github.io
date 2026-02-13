@@ -14,7 +14,7 @@ search for nearest neighors of any single object.
 
 The obvious solution of scanning every pair (or every n-tuple) is too slow for
 real world data, and so we need to find a way to quickly prune false negatives
-or group potential candidates together. I will cover some of these solution in
+or group potential candidates together. I will cover some of these solutions in
 this article.
 
 ### Metric spaces 
@@ -322,3 +322,66 @@ partially ordered lists. We can't always rely on this, especially on the very
 first frame, but if temporal coherence is assumed (which is the case in most
 video games), then the amortized running time for sweep and prune is
 $\mathcal{O}(n)$.
+
+### Grid hashing
+
+One important property of shapes in a metric space $(M, d)$ is that two shapes
+are more likely to be intersecting the closer they get, or more formally:
+
+$$ \lim_{d(A, B) \to 0} P(A \cap B \neq \varnothing) = 1 $$
+
+This only works with convex shapes (think of a circle inside a donut hole and
+why that wouldn't work), but we're dealing with rectangles so the above property
+holds. This is important because it implies that collision candidates at the
+very least should be objects that are naturally close to each other. However,
+it's not sufficient to rely on this verbatim: think of a rectangle with infinite
+width and infinite distance from our reference rectangle. We need to look at not
+just the center point of a shape, but its boundary points as well. For AABB
+rectangles, there are $4$ points for each shape.
+
+Grid hashing divides the space into a uniform grid where each cell is a bucket.
+For each rectangle $R$, we include $R$ once in every bucket containing at least
+one of the vertices of $R$. Collision can happen only between rectangles in the
+same bucket. Take a look at this image:
+
+<img src="./grid_hash_example.png" />
+
+The left side shows the grid and a 8 rectangles (each of which is labeled). The
+right side shows the grid and inside each cell there's a list of labels
+representing which rectangles are included in that cell. For each cell, we check
+for collision between rectangles in that cell's bucket.
+
+What are the speedup gains? Well, the naive approach would take $\binom{8}{2} =
+28$ comparisons, while here we only have$8$. Furhtermore, since we don't allow
+duplicate collisions, this is reduced to $7$.
+
+Grid hashing can be implemented using hash tables and tilesets. A hash table
+approach is more flexible but can result in hash collisions so it's a bit
+slower. A good hash function can be $h(x, y) = x * p_1 \oplus y * p_2 \mod n$
+where $p_1$ and $p_2$ are prime numbers and $n$ is the hash table size, or
+alternatively using Morton's space filling curve. Tilesets have a fixed range
+but hashing is precise and fast since it's a 2D matrix.
+
+Do you notice a problem with this approach? Look at the above image,
+specifically rectangle $2$, and how it might miss certain collisions.
+Here's a more clear example:
+
+<img src="./grid_hash_issue.png" />
+
+A shape that spans across more than two grid cells will not be included in the
+middle cells' buckets. In the above image, rectangles $1$ and $2$ intersect in
+the middle cell, but neither of them has an endpoint in that cell, so we lose
+information.
+
+Cell size is a hyperparameter, and grid hashing only works if all shapes are
+smaller than a cell (in all axes). If we know ahead of time that there's a
+maximum size for bounding volumes, this isn't an issue. If we don't know, then
+we can scan through all the objects ahead of time and determine the largest one.
+This is fine, but if there isn't an upper bound on the objects' sizes, then the
+cell size can grow indefinately which results in diminished performance gains. 
+
+An adaptive approach where the cell size isn't uniform is what we need. To do
+that, a hierarchical representation of the metric space is required, and this is
+done using trees.
+
+### Quad tree 
