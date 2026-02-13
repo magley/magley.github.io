@@ -27,13 +27,16 @@ and you can define a "distance" between any two things, you've got a metric spac
 The distance function is called a _metric_, and you use this metric to measure
 things beyond the distances between two objects in the set.
 The metric must satisfy these properties:
-- $d(x, x) = 0$
-- $d(a, b) > 0, \quad a \neq b$
-- $d(a, b) + d(b, c) \ge d(a, c)$
+- **p.1**$\quad d(x, x) = 0$
+- **p.2**$\quad d(a, b) = d(b, a)$
+- **p.3**$\quad d(a, b) > 0, \quad a \neq b$
+- **p.4**$\quad d(a, b) + d(b, c) \ge d(a, c)$
 
 The Euclidean space is a classic example of a metric space. It's how we percieve
 the world, it's what games use, and it's what we normally think of when we say
-"space".
+"space":
+
+<img src="./metric_space.png" />
 
 In more complicated scenarios where you have data of different type and none of
 them represent position in real space, you have to get creative. But as long as
@@ -43,6 +46,74 @@ function itself may be.
 
 This article will deal with the Euclidean space because it's primarilly written
 for game engines and because it's easy and intuitive to visualize.
+
+What does _intersection_ mean in the context of metric spaces? All elements in
+a metric space are points so they don't have a shape. Without a shape, we can't
+talk about intersection. Overlap of two distinct points is not possible because
+$d(a, b) = 0 \xRightarrow{\text{p.1}} a = b$.
+<br/>
+We cannot work on metric spaces alone. A ball $B$ of radius $r$ centered at $c
+is a subset of the metric space defined like so:
+
+$$B(c, r) = \\{ x \in M \mid d(c, x) < r \\} $$
+
+A line segment is a set of points which we can define with a parametric equation:
+
+$$L(a, b) = \\{ (1 - t)a + tb \mid t \in [0, 1] \\}$$
+
+See the image below. I didn't even touch up on the subject of boundaries: a ball
+may or may note include its boundary ($d(c, x) \leq r$ or $d(c, x) < r$).
+Usually balls are "open" meaning the boundary isn't included. But for our line
+definition, we said $t \in [0, 1]$ which includes the endpoints $a$ and $b$. In
+pracice, we never really deal with continuous spaces because of natural
+limitations of hardware, so this problem is eliminiated by sacrificing precision.
+
+<img src="./metric_ball_line.png" />
+
+Polygons are tricky: we start with a union of line segments such that each endpoint
+belongs to exactly $2$ line segments (like a closed chain):
+
+$$P(p_1, p_2, ..., p_n) = L(p_1, p_2) \cup L(p_2, p_3) \cup ... \cup L(p_{n-1}, p_n)$$
+
+That's only for the polygon boundary; what about the interior? Well, we need to
+define what an interior is. Take a look at the image below:
+
+<img src="./metric_polygon_boundary.png">
+
+Why do we know that the shaded area is the interior of $P(a,b,c,d,e)$? There isn't
+enough information right now to make this assumption. Jordan curve theorem states
+that an interior and exterior will always exist, but determining which is which
+is up to us. This is where the concept of _orientation_ comes in. Normally we
+define all points in a clockwise or counter clockwise order. Once we do that,
+a polygon with its interior can be defined as:
+
+$$P(p_1, p_2, ..., p_n) = \\{ k_1p_1 + k_2p_2 + ... + k_{n}p_{n} \ge 0 \mid \sum_{i=1}^{n} k_i = 1 \\}$$
+
+which is just a generalization of the line segment definition.
+
+Intersection of shapes becomes intersection of sets. There is an intersection
+between shapes $A$ and $B$ if $A \cap B \neq \varnothing$. We can't compute
+these set intersections because there is an infinite amount of points in any
+shape. Instead, we rely on analytic solutions or clever vector formulas to come
+to a conclusion.
+<br/>
+Determining the intersecting region in the general sense is not possible (for
+polygons we could use clipping algorithms), but that's not an issue because in
+game physics we only care about the normal vector of the intersection,
+intersection depth projected along that normal vector and a finite set of
+clipping points (in 2D it's usually $2$ points at most). This is a topic for
+narrow phase collision, though.
+
+All this talk about metric spaces, and yet the rest of this article will deal
+with vectors, trees and a bunch of `if` statements, so why bother? I wanted to
+help build an intuition on how these algorithms and data structures came to be.
+Much of the work here can be visualized and the correctness of this visualiation
+depends on understanding first principles which, for in this article, are metric
+spaces. By formalizing what's otherwise considered common knowledge, we can
+eliminate hand-wavy logic. Just by having you think about what happens when
+_shapes_ become infinitely big or small, or what happens when two _shapes_ are
+infinitely far away, you can start to appreciate why the assumptions are valid,
+or at the very least _feel_ valid.
 
 ### Problem formulation
 
@@ -64,7 +135,7 @@ talk about unordered pairs $\\{e_1, e_2\\}$.
 
 We know ahead of time which entity pairs can be elements of the resulting set.
 Any entity can be paired up against any other entity (except for itself), so if
-we have $n$ entities, the total number of possible pairs is \binom{n}{2}$.
+we have $n$ entities, the total number of possible pairs is $\binom{n}{2}$.
 
 It's important to establish the concept of _bounding volumes_. Take a look at
 the image below. If every entity in the scene is a star, then checking for star
