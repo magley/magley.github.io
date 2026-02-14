@@ -420,8 +420,10 @@ as empty space between these clusters. The memory footprint of empty space is
 minimal.
 <br/>
 Compared to grid hashing, quad trees don't suffer from objects spanning more
-than two cells (nodes) in either direction, because the $2 \times 2$ split
-ensures that leaf nodes anywhere in the tree will contains the object.
+than two cells (nodes) in either direction, because there's an inversion of
+control happening here: in grid hashing, it's the object deciding which buckets
+its belongs to; in quad trees, it's the nodes themselves deciding which objects
+belong to its bucket.
 
 Unfortunately, quad trees come with several drawbacks.
 <br/>
