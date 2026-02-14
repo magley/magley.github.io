@@ -385,3 +385,74 @@ that, a hierarchical representation of the metric space is required, and this is
 done using trees.
 
 ### Quad tree 
+
+Quad trees are a spatial data structure used to segment 2D space. The 3D analog
+is the oct tree, and it works the same way.
+
+A node in the quad tree is a rectangle representing some area in space. Objects
+are added to the node until the node's capacity is reached. When that happens,
+the node splits into 4 children, and each object of the node is passed to the
+child whose area intersects with the object. This process repeats recursively,
+or until a node reaches a certain minimum size after which splitting is no
+longer possible. Leaf nodes of the quad tree are buckets containing collision
+candidates.
+
+The image below demonstrates a quad tree. The left side shows the measurable
+space and all bounding boxes of the objects. Each object is labeled from $1$ to
+$7$. A grid is drawn representing the quad tree split. The right side
+illustrates the quad tree structure itself. We assume that the capacity of any
+node is $2$. At the top of the tree is the root node, spanning the entire space.
+Because there are $7 > 2$ objects covering the root node, a split occurs, and
+each child (top-left, top-right, bottom-left, bottom-right) is $1/4$ the area of
+its parent node. Leaf nodes are shaded and labels of objects spanning the leaf
+are written underneath. The bottom-right child of the root splits once again.
+
+<img src="./quad_tree.png" />
+
+There are $5$ comparisons made in total ($4$ if you discount duplicates),
+compared to the brute force solution requiring $21$ comparisons. How well a quad
+tree performs depends on the capacity hyperparameter. Intuitively, we'd want to
+set it to a value $c$ that maximizies the performance gain $n^2 - \frac{n}{c}
+c^2$ and minimizes necessary work $\frac{n}{c} c^2 = nc$.
+
+Quad trees adapt well to cases where we have local clusters of objects as well
+as empty space between these clusters. The memory footprint of empty space is
+minimal.
+<br/>
+Compared to grid hashing, quad trees don't suffer from objects spanning more
+than two cells (nodes) in either direction, because the $2 \times 2$ split
+ensures that leaf nodes anywhere in the tree will contains the object.
+
+Unfortunately, quad trees come with several drawbacks.
+<br/>
+(1) First, they're designed for particles (no shape). Notice how in the picture
+above, a single object is contained in multiple buckets. This can degenerate
+into the naive approach, but such cases are rare. That said, duplicates are
+extremely common and bring degradataion performance when constructing trees
+since the probability of a node split increases. <br/>
+(2) Second, the previously mentioned capacity hyperparameter $c$ can make or
+break broad phase optimization. If your game guarantees a sane distribution of
+elements across space, $c$ is easy to compute. If the objects are large and $c$
+is small, you'll quickly end up with a complete tree, split to the very end. At
+that point, quad trees behave like grid hashing, with the added overhead of
+constructing the tree. <br/>
+(3)  Third, you _have_ to specify the space size ahead of time. This may seem
+like a non issue, and you could certainly compute these bounds in $O(n)$ for
+each frame, it makes any attempt at clever optimization of $c$ impossible. Not
+only that, but you have to decide the minimum allowed node size beyond which
+splitting isn't allowed.
+
+Let's take a step back and reason about where these issues with quad trees come
+from. You are taking a fixed chunk of space and splitting into a non-uniform
+grid. You are requiring objects to conform to this grid, no matter where they
+are positioned. Constructing a quad tree seems clever because at no point does
+the tree have to think which node to pass an object along, it's a matter of "you
+crossed this line, so at the very least you go here". The tree is constructed
+according to the space, which is constant, instead of according to the objects,
+whose positions and shapes are ephemeral.
+
+Quad trees optimize for the wrong metric: the density of objects in a unit of
+space. Instead, trees should infer their shape and structure based on the
+objects' natural metrics, and that's what R-trees do.
+
+### R-tree
