@@ -481,6 +481,22 @@ yield a larger unused area.
 
 <img src="./rtree_split.png" />
 
+
+The intuition behind this is that greater unused area means more compact
+bounding boxes for the two new nodes. If two objects are far apart, then the
+unused area between them increases. We've already established that the
+probability of intersection decreases as the objects get further and further
+apart. See the image below, the $A$ split is unnatural and leads to computation
+time wasted on cases which are visually obviously negative.
+<br/>
+Another thing I should point out is that we can maximize/minimize the perimiter
+of the rectangles instead of their areas. Think of a thin but extremely long
+rectangle. Its area may not be large, but the distance of two objects along the
+longer axis is large, then the algorithm will correctly split so that the two
+objects cannot intersect.
+
+<img src="./rtree_intuition.png" />
+
 Finding the area of a union of 2D rectangles is Klee's measure problem for the
 case $d=2$ which can be solved using Bentley's algorithm in $O(n\log{n})$. In fact,
 it can be shown that for $d=2$, the lower bound for a solution is
@@ -509,6 +525,13 @@ $d$ dimensions.
 - **Quadratic split**: Find the two objects with the maximum unused area:
 $Area(N_i \cup N_j) - Area(N_i) - Area(N_j)$. Those two best objects are
 _seeds_. For every other object, greedily insert it into the _seed_ with the
-maximum area expansion. Runs in $O(n^2)$.
+maximum unused area. Runs in $O(n^2)$.
 - **Exponential split**: Same as quadratic split, but all $O(2^n)$ combinations
 are attempted.
+
+<!-- TODO: R*-tree, Hilbert R-tree, Sort-Tile-Recursive -->
+
+The main issue with these approximations is that they introduce overlap between
+nodes, which leads to degradation of performance. The bottleneck of r-trees is
+not construction, but querying. In general it is better to opt for a quadratic
+split which, while more costly to create, yields fewer false positives. 
