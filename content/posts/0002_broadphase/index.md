@@ -245,7 +245,7 @@ search and this is what we use to quickly find the upper bound.
 
 What is the upper bound in our example? It's the first object whose left edge is
 bigger than the 6th object's right edge (9). We use binary search to find this
-object in $O(logn)$.
+object in $O(\log{n})$.
 
 What about the lower bound? It's the first object whose right edge is smaller
 than the 6th object's left edge (3). We can't do binary search here because the
@@ -260,7 +260,7 @@ narrow phase collision (use the actual shapes instead of bounding volumes). The
 running time of this pseudo-sweep and prune algorithm is still $O(n^2)$, but the
 average case yields better performance than the naive approach. Furthermore,
 if we can assume temporal coherence (more on that below), then the amortized runtime
-can be reduced to $\mathcal{O}(nlogn)$.
+can be reduced to $\mathcal{O}(n\log{n})$.
 
 ---
 
@@ -307,10 +307,10 @@ once.
 
 <img src="./sweep_and_prune.png" width="800"/>
 
-The performance of sweep and prune is $O(nlogn + k)$ where $k$ is the maximum
+The performance of sweep and prune is $O(n\log{n} + k)$ where $k$ is the maximum
 number of pairs. In the worst case it's $\binom{n}{2}$, but the worst case is
 almost never occurs, and $k$ is usually $O(n)$, so the running time is
-approximated to $O(nlogn)$. This can be further improved. A lot of processing
+approximated to $O(n\log{n})$. This can be further improved. A lot of processing
 time is wasted on sorting the array at each invocation of the algorithm. Think
 about temporal coherence: between two calls of the algorithm (usually two
 adjacent frames in a game), the objects will not move much far because their
@@ -453,8 +453,62 @@ crossed this line, so at the very least you go here". The tree is constructed
 according to the space, which is constant, instead of according to the objects,
 whose positions and shapes are ephemeral.
 
-Quad trees optimize for the wrong metric: the density of objects in a unit of
+Quad trees optimize for the wrong measure: the density of objects in a unit of
 space. Instead, trees should infer their shape and structure based on the
-objects' natural metrics, and that's what R-trees do.
+objects' natural measures, and that's what R-trees do.
 
 ### R-tree
+
+R-trees are trees where a node can have up to $B$ children ($B$ is a
+hyperparameter). Each node represents a subsegment of the space, and areas can
+overlap (they can overlap in quad trees too, but only ancestor-child nodes).
+R-trees can span an arbitrary space, and they the nodes cover as much space as
+is needed, but not more.
+
+The principle of r-trees is similar to quad trees: insert objects to a node,
+split the node when object count overflows the capacity. Unlike quad trees,
+r-trees split unevenly, trying to make the new child nodes as small as possible.
+
+A split of an r-tree node is made by optimizing some measure, most commonly
+maximizing unused area:
+
+$$ \argmax_{N_1, N_2} Area(N \setminus (N_1 \cup N2)) $$
+
+Take a look at the picture below. The leftmost image is an r-node (red outline)
+containing $5$ objects. On the right are two different splits, labelled $A$ and
+$B$, with their bounds highlighted in blue. In this example, the split $A$ would
+yield a larger unused area.
+
+<img src="./rtree_split.png" />
+
+Finding the area of a union of 2D rectangles is Klee's measure problem for the
+case $d=2$ which can be solved using Bentley's algorithm in $O(n\log{n})$. In fact,
+it can be shown that for $d=2$, the lower bound for a solution is
+$\Omega(n\log{n})$.
+<br/>
+In general, there are $2^{n-1}-1$ possible ways to split an r-tree node
+containing $n$ elements, where each object can be put inside one or both nodes
+(the areas of child nodes can overlap).
+<br/>
+Finding the optimal split therefore has an upper bound of $O(2^{n}n\log{n})$,
+which isn't practical for real use cases.
+
+In order to improve on this, we have to introduce approximations and heuristics.
+These optimizations often rely on choosing two _seed_ objects as pivots for the
+new nodes, and then expanding the pivots for each remaining node based on the
+heuristic of minimal area expansion when inserting the object $o$: 
+
+$$\argmin_{i \in \\{1, 2\\}} Area(N_i \cup o) $$
+
+The original paper on r-trees introduces three such splits:
+
+- **Linear split**: On each axis, find the two objects furthest apart on that
+axis. Those two best objects are _seeds_. For every other object, greedily
+insert it into the _seed_ with the minimal area expansion. Runs in $O(nd)$ in
+$d$ dimensions.
+- **Quadratic split**: Find the two objects with the maximum unused area:
+$Area(N_i \cup N_j) - Area(N_i) - Area(N_j)$. Those two best objects are
+_seeds_. For every other object, greedily insert it into the _seed_ with the
+maximum area expansion. Runs in $O(n^2)$.
+- **Exponential split**: Same as quadratic split, but all $O(2^n)$ combinations
+are attempted.
