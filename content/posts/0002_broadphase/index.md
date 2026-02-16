@@ -465,11 +465,11 @@ overlap (they can overlap in quad trees too, but only ancestor-child nodes).
 R-trees can span an arbitrary space, and they the nodes cover as much space as
 is needed, but not more.
 
-The principle of r-trees is similar to quad trees: insert objects to a node,
+The principle of R-trees is similar to quad trees: insert objects to a node,
 split the node when object count overflows the capacity. Unlike quad trees,
-r-trees split unevenly, trying to make the new child nodes as small as possible.
+R-trees split unevenly, trying to make the new child nodes as small as possible.
 
-A split of an r-tree node is made by optimizing some measure, most commonly
+A split of an R-tree node is made by optimizing some measure, most commonly
 maximizing unused area:
 
 $$ \argmax_{N_1, N_2} Area(N \setminus (N_1 \cup N2)) $$
@@ -502,7 +502,7 @@ case $d=2$ which can be solved using Bentley's algorithm in $O(n\log{n})$. In fa
 it can be shown that for $d=2$, the lower bound for a solution is
 $\Omega(n\log{n})$.
 <br/>
-In general, there are $2^{n-1}-1$ possible ways to split an r-tree node
+In general, there are $2^{n-1}-1$ possible ways to split an R-tree node
 containing $n$ elements, where each object can be put inside one or both nodes
 (the areas of child nodes can overlap).
 <br/>
@@ -516,7 +516,7 @@ heuristic of minimal area expansion when inserting the object $o$:
 
 $$\argmin_{i \in \\{1, 2\\}} Area(N_i \cup o) $$
 
-The original paper on r-trees introduces three such splits:
+The original paper on R-trees introduces three such splits:
 
 - **Linear split**: On each axis, find the two objects furthest apart on that
 axis. Those two best objects are _seeds_. For every other object, greedily
@@ -529,9 +529,21 @@ maximum unused area. Runs in $O(n^2)$.
 - **Exponential split**: Same as quadratic split, but all $O(2^n)$ combinations
 are attempted.
 
-<!-- TODO: R*-tree, Hilbert R-tree, Sort-Tile-Recursive -->
-
 The main issue with these approximations is that they introduce overlap between
-nodes, which leads to degradation of performance. The bottleneck of r-trees is
+nodes, which leads to degradation of performance. The bottleneck of R-trees is
 not construction, but querying. In general it is better to opt for a quadratic
 split which, while more costly to create, yields fewer false positives. 
+
+Both the quadratic and linear split result in a large overlap. There exist
+variations of the R-tree that attempt to reduce this. For example, the _R*-tree_
+tries to minimize the nodes' area, perimiter and total overlap between siblings.
+Furthermore, it tries to evade splitting the node whenever possible by taking
+the $f \in [0, 1]$ (usually $~30\\%$) furthest objects from the node's center
+and reinsert them starting from the root. This idea takes inspriation from how
+B-trees are balanced. R*-trees construction is far more costly, but it makes up
+for quicker amortized queries because of the reduced overlap.
+<br/>
+Unfortunately, R*-trees behave poorly for densly packed objects in a small
+space. Because R-trees are not unique (unless we split using the optimal
+approach which isn't practical), the order in which objects are inserted can
+significantly impact performance.
