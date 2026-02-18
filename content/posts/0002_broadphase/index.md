@@ -547,3 +547,45 @@ Unfortunately, R*-trees behave poorly for densly packed objects in a small
 space. Because R-trees are not unique (unless we split using the optimal
 approach which isn't practical), the order in which objects are inserted can
 significantly impact performance.
+
+### Bulk R-tree
+
+Because we know our input data ahead of time, we can perform certain _bulk
+loading_ mechanisms to preprocess the objects in such a way that the tree is
+more optimized. 
+
+These mechanisms have us build the tree in a bottom-up procedure, which greatly
+simplifies the construction of an R-tree as we no longer have to split nodes and
+re-insert objects to keep the tree sorted nor perform expensive heuristics to
+reduce overlap between nodes.
+<br/>
+The general idea behind all of these mechanisms is the same: leaves are built
+from objects which are locally close (per the distance metric $d$), upper level
+nodes are built using the same heuristics, the process repeats recursively until
+we are left with a level with a single node - the root. The heuristic in this
+case is an ordering function by which the objects are sorted.
+
+**Nearest-X** is a simple bulk-loading algorithm which sorts the objects
+on the $x$ axis and groups objects into segments of size $k$. A new
+R-tree node is assigned to contain each group. The process repeats while $k$ is
+reduced in each upper level of the tree. 
+
+Observe the following example. There is a scene with $n=8$ objects in it, and we
+set the capacity to $k=3$ (top-left image). Assume the objects have been sorted
+by the x value of their centroid. The first $k=3$ objects will be grouped into
+the first leaf node, the second $3$ objects into the second leaf node and the
+last remaining $2$ objects into the third leaf node (top-right image, leaf node
+represented by a red rectangle). There are $3$ leaves in the topmost layer in
+the tree so far, so we continue with the algorithm. Now $n=3$ and
+$k=\max\\{\frac{n}{k}, 2\\}=2$ ($k$ mustn't be $1$ to prevent infinite
+recursion). The first two leaves are grouped in the first new node, while the
+last leaf in the second node (bottom-left image, the new nodes are blue). There
+are $2$ nodes in the topmost layer in the tree so far, so we continue. $n=2$ and
+$k=2$. The two "blue" nodes are grouped together into a single new node of the
+new layer (bottom-right image, the new node is black). There's $1$ node in the
+topmost level, so it has to be the root and the algorithm is finished.
+
+<img style="display: inline;" src="./rtree_nearest_x_01.png" width="49%" />
+<img style="display: inline;" src="./rtree_nearest_x_02.png" width="49%" />
+<img style="display: inline;" src="./rtree_nearest_x_03.png" width="49%" />
+<img style="display: inline;" src="./rtree_nearest_x_04.png" width="49%" />
