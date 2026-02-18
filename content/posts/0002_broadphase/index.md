@@ -589,3 +589,42 @@ topmost level, so it has to be the root and the algorithm is finished.
 <img style="display: inline;" src="./rtree_nearest_x_02.png" width="49%" />
 <img style="display: inline;" src="./rtree_nearest_x_03.png" width="49%" />
 <img style="display: inline;" src="./rtree_nearest_x_04.png" width="49%" />
+
+We don't have to sort the nodes themselves. If the objects are sorted by their
+centroid, then all later encompassing nodes, effectively convex hulls, will have
+their centroids also ordered. The time complexity is $O(n\log{n}+nd)$, where $d
+\approx \log_k{n}$ is the tree depth.
+
+_Nearest-X_ works well in general cases, but its performance depends on the
+$x$-distribution of the objects. The degenerate case is when all the objects'
+centroids align on the $x$-axis. We could circumvent this by doing a linear pass
+and determining the axis with the greater variance on which the sorting should
+occur.
+
+**Sort-Tile-Recursive** improves upon _Nearest-X_ by attempting to group objects
+on the $y$-axis as well. While _Nearest-X_ sorts the objects only along the
+$x$-axis, $Sort-Tile-Recursive$ uses a more advanced approach:
+
+1. Sort all the objects along the $x$ axis.
+2. For each slice of size $\lceil \sqrt{n/k} \rceil$, sort the objects along
+   the $y$ axis.
+   
+The idea here is to sort by $x$ and $y$ at the same time, but because there's no
+natural ordering of two-dimensional data, we approximate the other axis. What
+this does is it effectively tries to group objects into a tile grid.
+
+See the image below for an example ($n=16, k=5$). In top-left, the rectangles
+have been sorted along the $x$-axis by their centroid, and labelled. The sorted
+list is grouped into slices of size $\lceil \sqrt{16/5} \rceil = 2$ as shown in
+the top-right, slices being represented by colors of their objects. Each slice
+object is sorted along the $y$ axis and the new labels are shown in bottom-left.
+Finally, we group the objects into $k$ segments just like in _Nearest-X_,
+resulting in the nodes shown in the bottom-right image ($A, B, C, D$). The
+algorithm then repeats (create $\lceil \sqrt{4/5} \rceil$ slices, group into $k$
+etc.) until we arrive at the root node.
+
+<img style="display: inline;" src="./rtree_str_01.png" width="49%" />
+<img style="display: inline;" src="./rtree_str_02.png" width="49%" />
+<img style="display: inline;" src="./rtree_str_03.png" width="49%" />
+<img style="display: inline;" src="./rtree_str_04.png" width="49%" />
+
