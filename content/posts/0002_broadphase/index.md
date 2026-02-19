@@ -689,3 +689,29 @@ $$ f^{-1} : [0, 1]^n \to [0, 1] $$
 This ordering still isn't total, but there's no bias towards either axis. If we
 could sort our rectangles using an inverse space filling curve, we could improve
 upon the previous bulk-loaded R-trees.
+
+### Hilbert R-tree
+
+The Hilbert R-tree is a bulk loading mechanism for R-trees, similar to X-sort
+and Sort-Tile-Recursive. Rectangles are sorted according to the Hilbert value
+(inverse Hilbert space filling curve) of their centroids. The rest of the
+algorithm groups objects in the same way as X-sort.
+
+Since space filling curves are continuous, we cannot represent them accurately
+in computers. Computing the Hilbert value of a 2D point thus approximates the
+true value. In this case, the space is segregated in an imaginary grid, and the
+Hilbert value of a point is the index of the grid cell containing the point,
+where the cells are ordered along the Hilbert curve pattern.
+
+The result is not a real number in $[0, 1]$, but an integer in $[0, 2^{2k}]$
+where $k$ is the precision of the Hilbert curve approximation. This parameter is
+usualy bounded to $32$ or $64$, as the algorithm for computing the Hilbert value
+relies on bit manipulation. All the points in the metric space must be in the
+range $[0, 2^k)$, the space has to be scaled beforehand.
+
+The resulting Hilbert R-tree usually looks like a hieararchy of non-uniform grid
+cells. This goes back to earlier where we touched upon the drawbacks of Grid
+hashing. The complexity of constructing a Hilbert R-tree is $O(n\log{n}+nd+nk)$,
+as each rectangle is mapped to a Hilbert value in $O(k)$ only once (Schwartzian
+transform).
+
