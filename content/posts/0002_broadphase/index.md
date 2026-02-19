@@ -596,9 +596,12 @@ their centroids also ordered. The time complexity is $O(n\log{n}+nd)$, where $d
 \approx \log_k{n}$ is the tree depth.
 
 _Nearest-X_ works well in general cases, but its performance depends on the
-$x$-distribution of the objects. The degenerate case is when all the objects'
-centroids align on the $x$-axis. We could circumvent this by doing a linear pass
-and determining the axis with the greater variance on which the sorting should
+$x$-distribution of the objects. Sorting on the $x$ axis will usually result in
+a tree where each node is narrow but tall. While the compactness improves
+performance, the large perimiter of each node lowers the performance of region
+queries. Furthermore, the degenerate case is when all the objects' centroids
+align on the $x$-axis. We could circumvent this by doing a linear pass and
+determining the axis with the greater variance on which the sorting should
 occur.
 
 **Sort-Tile-Recursive** improves upon _Nearest-X_ by attempting to group objects
@@ -628,3 +631,61 @@ etc.) until we arrive at the root node.
 <img style="display: inline;" src="./rtree_str_03.png" width="49%" />
 <img style="display: inline;" src="./rtree_str_04.png" width="49%" />
 
+This is better, but there's still a bias towards $x$ distribution because of how
+the sorting function compares rectangles. If we could come up with a heuristic
+function $f : \mathbb{R}^2 \to \mathbb{R}$.
+
+### Space filling curves
+
+Time for some more math. I've discussed that a metric space is a set of objects
+coupled with a distance function. This idea of a "set with some operations" is
+known as an _alegbraic structure_ and is studied in abstract algebra. Other
+algebraic structures are _groups_, _fields_, _rings_, _lattices_ etc.
+
+Metric spaces are a bit special, because they are not _pure_ algebraic
+structures, as they have a non-algebraic structure borrowed from topology. The
+Euclidean 2D metric space is isomorphic to the vector space of complex numbers
+$\mathbb{C}$. This just means that certain properties of complex numbers also
+hold for 2D Euclidean spaces. <br/>
+Specifically, there is no total order on $\mathbb{C}$, which is to say that you
+can't order complex numbers in such a way that no contradictions arise when also
+comparing the sums/products of complex numbers. The Euclidean 2D metric space
+also has no total order as it is not compatible with the topology of the metric
+space. An explanation on why this is the case is a bit tricky, but a simplified
+version is that any ordering of 2D numbers does not generate a space that's
+compatible with Euclidean 2D space (neighborhoods stop being balls).
+
+The X-sort and Sort-Tile-Recurse generate a non-Euclidean topology, which is why
+these algorithms are imperfect. The crux of this imperfection, like I've said,
+is bias towards one axis. What if there was a way to order points such that both
+axes contributed just as likely?
+
+Enter _space filling curves_. A space filling curve is a function that maps a
+unit range onto a unit $n$-dimensional cube:
+
+$$ f : [0, 1] \to [0, 1]^n $$
+
+Imagine you were tasked to draw a single line from the bottom-left corner of a
+sheet to paper to the top-right corner of a sheet of paper, covering the entire
+paper, without lifting your pen off the paper. Visually, a space filling curve
+would then map your progress so that $f(0)$ is the moment you begin, and $f(1)$
+is the moment you finish.
+
+Many space filling curves are fractals, like the Peano curve (left) and Hilbert
+curve (right). That's helpful because the functions can be expressed recursively
+and thought about through iterations. The two images below are not _the_ Peano
+and Hilbert curves, because they're not really filling up the entire space.
+They're the 3<sup>rd</sup> iteration of their curves. Each successive iteration
+fills up more space, so when $\text{iter} \to \infty$, the curve truly does fill
+up the entire space of a unit square.
+
+<img src="./space_filling_curves.png" width="60%"/>
+
+Why is this important? Because the inverse space filling curve maps points to
+the real numbers which gives us a ordering.
+
+$$ f^{-1} : [0, 1]^n \to [0, 1] $$
+
+This ordering still isn't total, but there's no bias towards either axis. If we
+could sort our rectangles using an inverse space filling curve, we could improve
+upon the previous bulk-loaded R-trees.
