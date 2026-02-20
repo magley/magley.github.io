@@ -715,3 +715,61 @@ hashing. The complexity of constructing a Hilbert R-tree is $O(n\log{n}+nd+nk)$,
 as each rectangle is mapped to a Hilbert value in $O(k)$ only once (Schwartzian
 transform).
 
+### K-d trees
+
+In the naive approach section, I briefly touched upon an idea of splitting the
+entire space into two different subregionsn and by doing that, we were able to
+reduce the total number of computations. The method of splitting assumed there
+were two disjoint clusters of rectangles, which isn't always the case. While
+that wasn't a practical solution, the idea of splitting a region into two could
+be utilized in a different way.
+
+If we split the rectangles by their median element (median of sorted rectangles
+on one axis), then we could easily discard half of the elements when querying
+any one rectangle for collision. For example, let's sort along the rectangles by
+their right edge and draw a line along the median:
+
+<img src="./k_d_tree_01.png" width="50%"/>
+
+To query any rectangle, we need to determine how to discrd either of these
+sides. We could compare the right edge of the query rectangle $r$: if it's on
+the left side of the median line $m$, then so is the left edge of $r$, so we can
+discard the right side of the split. We can't always discard, but we can
+_sometimes_.
+
+Let's _not_ stop there: not let's split the two subregions using the same process.
+
+<img src="./k_d_tree_02.png" width="50%"/>
+
+This time around, some rectangles intersect the median line, which is why can't
+always know for certain if one of the two sides can be discarded when querying.
+We can repeat this process until we are left with $1$ rectangle in the subregion.
+
+<img src="./k_d_tree_03.png" width="50%"/>
+
+This is a binary search with charactersists similar to interval trees and
+segment trees. A flaw of this approach is, once again, bias towards the $x$
+axis. A much better approach would be to alternate the axis: $(x, y, x, y, ...)$
+such that the $2i$<sup>th</sup> level uses the $x$ axis, while the $2i +
+1$<sup>th</sup> level uses the $y$ axis when splitting along the median. Such a
+tree is called a _k-d tree_.
+
+The image below shows what that a k-d tree would look like for the previous
+input. The median lines are, in order: red, blue, orange. Line orientation
+alternates. K-d trees aren't completely unbiased, as the initial order
+of the axes affects the final tree. In the right side of the below image,
+the axes are flipped so that the root is split along the $x$ axis etc.
+
+<img src='./k_d_tree_proper_01.png' width="49%"/>
+<img src='./k_d_tree_proper_02.png' width="49%"/>
+
+While constructing a k-d tree can go on until a leaf node has exactly one
+element, such trees would be too deep and would require too many queries. The
+capacity hyperparameter $c$ must be chosen and should be at least $2^k$, where
+$k$ is the dimensionality of the $k$-d tree.
+
+Building a k-d tree can be done in $O(n\log{n}\log{n})$. By pre-sorting along
+each of the $k$ axes, this can be brought down to $O(kn\log{n})$. If a clever
+algorithm for finding the medians is used (without sorting), this can further
+be brought down to $O(n\log{n})$. Querying a single rectangle, in the worst
+case, is $O(n)$, while in an ideal case it's $O(\log{n} + c)$. 
