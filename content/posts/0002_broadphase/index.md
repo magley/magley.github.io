@@ -773,3 +773,39 @@ each of the $k$ axes, this can be brought down to $O(kn\log{n})$. If a clever
 algorithm for finding the medians is used (without sorting), this can further
 be brought down to $O(n\log{n})$. Querying a single rectangle, in the worst
 case, is $O(n)$, while in an ideal case it's $O(\log{n} + c)$. 
+
+### Benchmarking
+
+The implementations described above are benchmarked using the following parameters:
+
+- Algorithms
+- Entity count
+- Entity placement
+
+Entity count (i.e. the $n$) values were chosen to show degradation of
+performance but also spot any unusual cases for small $n$ (for example $n^2$
+behaves better than $100n$ for small $n$ but not in the general case).
+
+The way entities are placed, whether they form patterns, clusters, how uniform
+their distribution is etc. has helped us gain intuition behind using trees and
+various heuristics. Entity placement is also important in benchmarking, as
+certain algorithms and data structures make assumptions based on the
+aforementioned observations.
+
+- **Random** - randomly place entities using a uniform distribution
+- **RandomLargeBoxes** - same as above, but entities are orders of magnitude
+  larger so overlap is greater
+- **XLine** - entities are placed along a horizontal line, having large height
+  variance
+- **YLine** - entities are placed along a vertical line, having large width
+  variance
+- **TrueUniform** - entities are placed uniformly along a rectangular grid, but
+  their size slightly exceeds the grid cells to introduce overlap
+
+### Results
+
+<img src="./benchmarks/Random.png" width="49%"/>
+<img src="./benchmarks/RandomLargeBoxes.png" width="49%"/>
+<img src="./benchmarks/XLine.png" width="49%"/>
+<img src="./benchmarks/YLine.png" width="49%"/>
+<img src="./benchmarks/TrueUniform.png" width="49%"/>
