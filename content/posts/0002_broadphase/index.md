@@ -818,3 +818,22 @@ The first thing to notice is that for $n < 500$, the choice of which strategy to
 use doesn't matter all that much. If your game world can be subdivided into
 smaller rooms such that only one room has collision checking, you can get away
 with not using any broad phase strategy.
+
+Obviously, we're more interested in how the lines behave as $n \to \infty$. The
+interesting thing (although not that surprising) is that _Sweep and prune_
+outperforms all other data structures, except for the _XLine_ test. This makes
+sense, as the variance along the $x$-axis in that test is very low, so sorting
+and pruning accomplishes nothing. On the other hand, _Sweep and prune_ is
+extremely performant in the _YLine_ test, where the $x$ variance is large. Like
+we've discussed before, this irregular behavior can be remedied by checking
+which axis to use before the algorithm begins. 
+
+A strange phenomenon is that the _Quad tree_ performs much worse in _YLine_ than
+in _XLine_, even though the quad tree is an unbiased data structure. I first
+thought it was because the test area is $800\times600$ pixels big, the entities
+would spread out more along the $x$ axis which helped reduce overlap, especially
+because the entities are the same size with swapped axes in the two tests, so
+there would be greated overlap along the $y$ axis. Even after using the same
+dimensions for both axes, the _YLine_ test performed slightly worse (but way
+better than before). I'm not sure why this is the case yet, but it goes to show
+that the choice for hyperparameters is very important.
