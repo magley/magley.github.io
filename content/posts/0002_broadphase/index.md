@@ -795,17 +795,26 @@ aforementioned observations.
 - **Random** - randomly place entities using a uniform distribution
 - **RandomLargeBoxes** - same as above, but entities are orders of magnitude
   larger so overlap is greater
-- **XLine** - entities are placed along a horizontal line, having large height
-  variance
-- **YLine** - entities are placed along a vertical line, having large width
-  variance
+- **XLine** - entities are placed along a line centered on $x=c, c=const.$,
+  having large width variance
+- **YLine** - entities are placed along a line centered on $y=c, c=const.$,
+  having large height variance
 - **TrueUniform** - entities are placed uniformly along a rectangular grid, but
   their size slightly exceeds the grid cells to introduce overlap
 
 ### Results
+
+Below is a standard benchmark where the total time for a single frame is being
+measured (in ms). The reference values we are interested in are $33ms$ for $30$
+FPS and $16ms$ for $60$ FPS.
 
 <img src="./benchmarks/Random.png" width="49%"/>
 <img src="./benchmarks/RandomLargeBoxes.png" width="49%"/>
 <img src="./benchmarks/XLine.png" width="49%"/>
 <img src="./benchmarks/YLine.png" width="49%"/>
 <img src="./benchmarks/TrueUniform.png" width="49%"/>
+
+The first thing to notice is that for $n < 500$, the choice of which strategy to
+use doesn't matter all that much. If your game world can be subdivided into
+smaller rooms such that only one room has collision checking, you can get away
+with not using any broad phase strategy.
