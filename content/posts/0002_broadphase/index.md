@@ -841,3 +841,16 @@ there would be greated overlap along the $y$ axis. Even after using the same
 dimensions for both axes, the _YLine_ test performed slightly worse (but way
 better than before). I'm not sure why this is the case yet, but it goes to show
 that the choice for hyperparameters is very important.
+
+_R-trees_ have an unimpressive performance, especially the standard R-tree.
+Bulk-loading helps as it eliminates the need to reinsert nodes and keep the tree
+balanced. Amongst the bulk-loading strategies, _X-sort_ has the least overhead
+and produces satisfactory results. The only exception is the _XLine_ test, for
+the same reason as why _Sort and sweep_ behaved poorly in that test; we can use
+the same tactic of deciding the axis before sorting to improve performance.
+
+_K-d trees_ perform poorly because of the repeated sorting to find the mean.
+Like I've said, if we used a more clever but less percies method, this could
+improve build performance for the cost of query performance. In my experience,
+the _median of medians_ algorithm does not behave nicely for this use case so
+I've omitted it from the benchmarks.
