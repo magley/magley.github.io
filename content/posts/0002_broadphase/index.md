@@ -1,7 +1,7 @@
 ---
 title: Broad phase algorithms and data structures
-desc: Trees, sweeps and how to lie with big O
-date: 2026-02-10
+desc: Trees, sweeps and the big O
+date: 2026-02-26
 math: true
 # draft: true
 ---
@@ -16,6 +16,10 @@ The obvious solution of scanning every pair (or every n-tuple) is too slow for
 real world data, and so we need to find a way to quickly prune false negatives
 or group potential candidates together. I will cover some of these solutions in
 this article.
+
+If you just want the results, skip to [here](#benchmark-results). The source
+code for all the implementations can be found in [this github
+repository](https://github.com/magley/broad-phase).
 
 ### Metric spaces 
 
@@ -802,7 +806,7 @@ aforementioned observations.
 - **TrueUniform** - entities are placed uniformly along a rectangular grid, but
   their size slightly exceeds the grid cells to introduce overlap
 
-### Results
+### Results {#benchmark-results}
 
 Below is a standard benchmark where the total time for a single frame is being
 measured (in ms). The reference values we are interested in are $33ms$ for $30$
