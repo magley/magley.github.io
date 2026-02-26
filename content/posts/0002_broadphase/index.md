@@ -854,3 +854,62 @@ Like I've said, if we used a more clever but less percies method, this could
 improve build performance for the cost of query performance. In my experience,
 the _median of medians_ algorithm does not behave nicely for this use case so
 I've omitted it from the benchmarks.
+
+---
+
+There are a couple of remarks I want to make before finishing off.
+
+Firstly, the hyperparameters for all these strategies have been fixed throughout
+testing. A lot more research can be done on choosing these hyperparameter values
+based on _a priori_ information like entity count and entity distribution. Whether
+this would improve the performance of trees still cannot be assessed, because of
+the following remark.
+
+Second, each iteration of this test runs for one single frame. If it were run
+multiple times, then the auxilliary data structures would have to get
+reconstructed each time. Since the entities are assumed to be static, that would
+be a waste of processing time. We could cache the data structures between
+frames, making use of the temporal coherence assumption where very little would
+change between two consecutive frames. In fact, this would be the best approach
+for a dynamic environment. Many of these data structures, especially R-trees and
+K-d trees, support inserting and removing elements which is in general cheaper
+than reconstructing the entire tree. In fact, let's analyze how much time is
+spent building the data structure over to the total time spent. The charts below
+plot out the behavior.
+
+<img src="./benchmarks/buildSpaceRatioRandom.png" width="49%"/>
+<img src="./benchmarks/buildSpaceRatioRandomLargeBoxes.png" width="49%"/>
+<img src="./benchmarks/buildSpaceRatioXLine.png" width="49%"/>
+<img src="./benchmarks/buildSpaceRatioYLine.png" width="49%"/>
+<img src="./benchmarks/buildSpaceRatioTrueUniform.png" width="49%"/>
+
+A ratio of $0$ is ideal and means that the entire processing time was spent on
+finding the collision candidates. The naive approach has no preprocessing so it
+achieves this ratio. All other structures perform some combination of sorting,
+hashing and building trees. Larger ratios are better, because if we can optimize
+those, then the total time will be much smaller. As we can see, R-trees have the
+most potential of being optimized through caching, while K-d trees are a close
+runner up.
+
+This however goes beyond the scope of this article, but I'd like to do a _part
+2_ of this article focusing on this specific requirement where entities are
+dynamic. The important thing to note here is that there is much room for
+improvement.
+
+### Conclusion
+
+We've looked at several methods to reduce false positive collisions, most of
+them relying on spatial trees. All colliding objects have been abstracted as
+axis-aligned bounding boxes for simplicity. Much of the article focuses on
+building the intuition behind the approaches, explaining some of the math used
+to construct these geometric algorithms.
+
+Benchmarking has shown that the Sort and Sweep algorithm (also known as Sweep
+and Prune) performs the best even when there are thousands of overlapping
+objects. Furthermore, Sort and Sweep is much easier to implement than R-trees
+and K-d trees.
+
+The results of this article should be taken with a grain of salt: the choice of
+hyperparameters can greately affect the benchmarks. All entities are assumed to
+have been static, so a great deal of optimizations for dynamic environments
+haven't been considered.
