@@ -1,6 +1,17 @@
 baseURL = 'https://magley.github.io/'
 languageCode = 'en-us'
 title = "magley"
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true
+
+[languages]
+  [languages.en]
+    weight = 1
+    languageName = "English"
+
+  [languages.sr]
+    weight = 2
+    languageName = "Srpski"
 
 [params]
 title = "magley's website"

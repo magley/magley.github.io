@@ -12,7 +12,7 @@ entities have a position and a collision shape, while in databases entities are
 multimodal data points). We want to find collision between these objects, or to
 search for nearest neighors of any single object.
 
-The obvious solution of scanning every pair (or every n-tuple) is too slow for
+The obvious solution of scanning every pair (or every $n$-tuple) is too slow for
 real world data, and so we need to find a way to quickly prune false negatives
 or group potential candidates together. I will cover some of these solutions in
 this article.
