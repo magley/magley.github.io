@@ -56,7 +56,7 @@ a metric space are points so they don't have a shape. Without a shape, we can't
 talk about intersection. Overlap of two distinct points is not possible because
 $d(a, b) = 0 \xRightarrow{\text{p.1}} a = b$.
 <br/>
-We cannot work on metric spaces alone. A ball $B$ of radius $r$ centered at $c
+We cannot work on metric spaces alone. A ball $B$ of radius $r$ centered at $c$
 is a subset of the metric space defined like so:
 
 $$B(c, r) = \\{ x \in M \mid d(c, x) < r \\} $$
@@ -66,7 +66,7 @@ A line segment is a set of points which we can define with a parametric equation
 $$L(a, b) = \\{ (1 - t)a + tb \mid t \in [0, 1] \\}$$
 
 See the image below. I didn't even touch up on the subject of boundaries: a ball
-may or may note include its boundary ($d(c, x) \leq r$ or $d(c, x) < r$).
+may or may not include its boundary ($d(c, x) \leq r$ or $d(c, x) < r$).
 Usually balls are "open" meaning the boundary isn't included. But for our line
 definition, we said $t \in [0, 1]$ which includes the endpoints $a$ and $b$. In
 pracice, we never really deal with continuous spaces because of natural
