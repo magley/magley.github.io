@@ -112,7 +112,7 @@ All this talk about metric spaces, and yet the rest of this article will deal
 with vectors, trees and a bunch of `if` statements, so why bother? I wanted to
 help build an intuition on how these algorithms and data structures came to be.
 Much of the work here can be visualized and the correctness of this visualiation
-depends on understanding first principles which, for in this article, are metric
+depends on understanding first principles which, in this article, are metric
 spaces. By formalizing what's otherwise considered common knowledge, we can
 eliminate hand-wavy logic. Just by having you think about what happens when
 _shapes_ become infinitely big or small, or what happens when two _shapes_ are
@@ -228,7 +228,7 @@ between those two is a collision candidate for our object. Seems simple enough,
 but we need to be careful on how to sort the objects and how to find the bounds.
 
 For example, let's have an arrangement of objects like in the image below. We
-have sort the objects on the x axis according to some modification of the metric
+sort the objects on the $x$ axis according to some modification of the metric
 function $d^\prime : M \to \mathbb{R}$. In this example, I've used the $x$
 coordinate of the object's left edge. Below the objects is an axis line where
 you can clearly see the projection of the left edge. The numbers represent
