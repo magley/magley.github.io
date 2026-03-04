@@ -287,7 +287,7 @@ and on each occurrence of `[`, we increase the result by the stack size and push
 The next iteration of this problem requires us to retrieve all intersections.
 Each interval is numbered $1, 2, 3, ...$ and the algorithm should output a list
 of pairs $(i, j), i < j$. Notice first that we must be provided with the
-interval ordering or else the solution cannot be unique. Indeed, the input is
+interval ordering or else the solution cannot be unique. Indeed, the input
 `[[][]]` has different possible solutions: $\\{(1,2), (1,3)\\}, \\{(1,2),
 (2,3)\\}$. So let's assume that the input is a list of pairs `(char, int)`. To
 solve this problem, we keep a stack of integers denoting unclosed intervals
@@ -296,16 +296,16 @@ where `k_i` is the $i$-th element of the stack. This is the optimal solution to
 this problem and it has a worst-case running time of $O(n^2)$, though on average
 it's $O(n)$.
 
-Sweep and prune generalizes this approach. Let edge be a triple 
+Sweep and prune generalizes this approach. Let _edge_ be a triple 
 $(x, v, c) | x\in \mathbb{R}, v \in \mathbb{N}, c \in \\{0,1\\}$ 
 representing the edge's coordinate $x$, a unique identifier for 
 the volume or object $v$ which the edge belongs to, and a boolean 
-$c$ for the edge is opening (lower, leftmost, $0$) or closing 
-(upper, rightmost, $1$). We create a list of edges by mapping
+$c$ for the edge is opening (lower, leftmost; $0$) or closing 
+(upper, rightmost; $1$). We create a list of edges by mapping
 each object into two of these edge tuples. Then, we sort the list 
 by $x$ and perform the algorithm described above.
 
-See the image below. Time time we aren't querying each object individually, and
+See the image below. This time we aren't querying each object individually, and
 instead we're doing a linear pass through the list and generating all results at
 once.
 
