@@ -350,19 +350,19 @@ same bucket. Take a look at this image:
 
 <img src="./grid_hash_example.png" />
 
-The left side shows the grid and a 8 rectangles (each of which is labeled). The
-right side shows the grid and inside each cell there's a list of labels
+The left side shows the grid and a $8$ rectangles (each of which is labeled).
+The right side shows the grid and inside each cell there's a list of labels
 representing which rectangles are included in that cell. For each cell, we check
 for collision between rectangles in that cell's bucket.
 
 What are the speedup gains? Well, the naive approach would take $\binom{8}{2} =
-28$ comparisons, while here we only have$8$. Furhtermore, since we don't allow
+28$ comparisons, while here we only have $8$. Furhtermore, since we don't allow
 duplicate collisions, this is reduced to $7$.
 
 Grid hashing can be implemented using hash tables and tilesets. A hash table
 approach is more flexible but can result in hash collisions so it's a bit
 slower. A good hash function can be $h(x, y) = x * p_1 \oplus y * p_2 \mod n$
-where $p_1$ and $p_2$ are prime numbers and $n$ is the hash table size, or
+where $p_1$ and $p_2$ are prime numbers and $n$ is the hash table size; or
 alternatively using Morton's space filling curve. Tilesets have a fixed range
 but hashing is precise and fast since it's a 2D matrix.
 
