@@ -443,10 +443,10 @@ is small, you'll quickly end up with a complete tree, split to the very end. At
 that point, quad trees behave like grid hashing, with the added overhead of
 constructing the tree. <br/>
 (3)  Third, you _have_ to specify the space size ahead of time. This may seem
-like a non issue, and you could certainly compute these bounds in $O(n)$ for
-each frame, it makes any attempt at clever optimization of $c$ impossible. Not
-only that, but you have to decide the minimum allowed node size beyond which
-splitting isn't allowed.
+like a non issue, especially because you can certainly compute these bounds in
+$O(n)$ for each frame, but it makes any attempt at clever optimization of $c$
+impossible. Not only that, but you have to decide the minimum allowed node size
+beyond which splitting isn't allowed.
 
 Let's take a step back and reason about where these issues with quad trees come
 from. You are taking a fixed chunk of space and splitting into a non-uniform
