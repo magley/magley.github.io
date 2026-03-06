@@ -485,14 +485,12 @@ yield a larger unused area.
 
 <img src="./rtree_split.png" />
 
-
 The intuition behind this is that greater unused area means more compact
 bounding boxes for the two new nodes. If two objects are far apart, then the
-unused area between them increases. We've already established that the
-probability of intersection decreases as the objects get further and further
-apart. See the image below, the $A$ split is unnatural and leads to computation
-time wasted on cases which are visually obviously negative.
-<br/>
+unused area between is greater. We've already established that the probability
+of intersection decreases as the objects get further and further apart. See the
+image below, the $A$ split is unnatural and leads to computation time wasted on
+cases which are visually obviously negative. <br/>
 Another thing I should point out is that we can maximize/minimize the perimiter
 of the rectangles instead of their areas. Think of a thin but extremely long
 rectangle. Its area may not be large, but the distance of two objects along the
@@ -549,8 +547,8 @@ for quicker amortized queries because of the reduced overlap.
 <br/>
 Unfortunately, R*-trees behave poorly for densly packed objects in a small
 space. Because R-trees are not unique (unless we split using the optimal
-approach which isn't practical), the order in which objects are inserted can
-significantly impact performance.
+approach for splitting nodes which isn't practical), the order in which objects
+are inserted can significantly impact performance.
 
 ### Bulk R-tree
 
