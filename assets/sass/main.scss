@@ -131,10 +131,7 @@ figure {
 
 .figures-inline {
     display: flex;
-    gap: 1rem;
-    /* space between images */
     flex-wrap: wrap;
-    /* allows wrapping on smaller screens */
 }
 
 .figures-inline figure {

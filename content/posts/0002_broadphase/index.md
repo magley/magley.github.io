@@ -607,7 +607,7 @@ occur.
 
 **Sort-Tile-Recursive** improves upon _Nearest-X_ by attempting to group objects
 on the $y$-axis as well. While _Nearest-X_ sorts the objects only along the
-$x$-axis, $Sort-Tile-Recursive$ uses a more advanced approach:
+$x$-axis, _Sort-Tile-Recursive_ uses a more advanced approach:
 
 1. Sort all the objects along the $x$ axis.
 2. For each slice of size $\lceil \sqrt{n/k} \rceil$, sort the objects along
@@ -634,7 +634,8 @@ etc.) until we arrive at the root node.
 
 This is better, but there's still a bias towards $x$ distribution because of how
 the sorting function compares rectangles. If we could come up with a heuristic
-function $f : \mathbb{R}^2 \to \mathbb{R}$.
+function $f : \mathbb{R}^2 \to \mathbb{R}$ which treats both axes equally, we
+could eliminate this problem.
 
 ### Space filling curves
 
