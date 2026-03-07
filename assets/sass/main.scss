@@ -129,6 +129,18 @@ figure {
     margin: 0;
 }
 
+.figures-inline {
+    display: flex;
+    gap: 1rem;
+    /* space between images */
+    flex-wrap: wrap;
+    /* allows wrapping on smaller screens */
+}
+
+.figures-inline figure {
+    margin: 0;
+}
+
 /*
 @media (prefers-color-scheme: dark) {
     html {

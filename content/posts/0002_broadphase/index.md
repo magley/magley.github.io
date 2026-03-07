@@ -558,9 +558,8 @@ more optimized.
 
 These mechanisms have us build the tree in a bottom-up procedure, which greatly
 simplifies the construction of an R-tree as we no longer have to split nodes and
-re-insert objects to keep the tree sorted nor perform expensive heuristics to
-reduce overlap between nodes.
-<br/>
+re-insert objects to keep the tree blanaced nor perform expensive heuristics to
+reduce overlap between nodes. <br/>
 The general idea behind all of these mechanisms is the same: leaves are built
 from objects which are locally close (per the distance metric $d$), upper level
 nodes are built using the same heuristics, the process repeats recursively until
