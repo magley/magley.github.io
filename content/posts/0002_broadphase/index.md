@@ -657,10 +657,10 @@ space. An explanation on why this is the case is a bit tricky, but a simplified
 version is that any ordering of 2D numbers does not generate a space that's
 compatible with Euclidean 2D space (neighborhoods stop being balls).
 
-The X-sort and Sort-Tile-Recurse generate a non-Euclidean topology, which is why
-these algorithms are imperfect. The crux of this imperfection, like I've said,
-is bias towards one axis. What if there was a way to order points such that both
-axes contributed just as likely?
+The _X-sort_ and _Sort-Tile-Recurse_ generate a non-Euclidean topology, which is
+why these algorithms are imperfect. The crux of this imperfection, like I've
+said, is bias towards one axis. What if there was a way to order points such
+that both axes contributed just as likely?
 
 Enter _space filling curves_. A space filling curve is a function that maps a
 unit range onto a unit $n$-dimensional cube:
