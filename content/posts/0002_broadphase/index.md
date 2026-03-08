@@ -694,10 +694,10 @@ upon the previous bulk-loaded R-trees.
 
 ### Hilbert R-tree
 
-The Hilbert R-tree is a bulk loading mechanism for R-trees, similar to X-sort
-and Sort-Tile-Recursive. Rectangles are sorted according to the Hilbert value
-(inverse Hilbert space filling curve) of their centroids. The rest of the
-algorithm groups objects in the same way as X-sort.
+The Hilbert R-tree is a bulk loading mechanism for R-trees, similar to
+_Nearest-X_ and _Sort-Tile-Recursive_. Rectangles are sorted according to the
+Hilbert value (inverse Hilbert space filling curve) of their centroids. The rest
+of the algorithm groups objects in the same way as _Nearest-X_.
 
 Since space filling curves are continuous, we cannot represent them accurately
 in computers. Computing the Hilbert value of a 2D point thus approximates the
@@ -709,7 +709,7 @@ The result is not a real number in $[0, 1]$, but an integer in $[0, 2^{2k}]$
 where $k$ is the precision of the Hilbert curve approximation. This parameter is
 usualy bounded to $32$ or $64$, as the algorithm for computing the Hilbert value
 relies on bit manipulation. All the points in the metric space must be in the
-range $[0, 2^k)$, the space has to be scaled beforehand.
+range $[0, 2^k)$ on both axes, and so the space has to be scaled beforehand.
 
 The resulting Hilbert R-tree usually looks like a hieararchy of non-uniform grid
 cells. This goes back to earlier where we touched upon the drawbacks of Grid
