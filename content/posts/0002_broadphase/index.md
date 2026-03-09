@@ -720,7 +720,7 @@ transform).
 ### K-d trees
 
 In the naive approach section, I briefly touched upon an idea of splitting the
-entire space into two different subregionsn and by doing that, we were able to
+entire space into two different subregionns and by doing that, we were able to
 reduce the total number of computations. The method of splitting assumed there
 were two disjoint clusters of rectangles, which isn't always the case. While
 that wasn't a practical solution, the idea of splitting a region into two could
@@ -733,13 +733,13 @@ their right edge and draw a line along the median:
 
 <img src="./k_d_tree_01.png" width="50%"/>
 
-To query any rectangle, we need to determine how to discrd either of these
+To query any rectangle, we need to determine how to discard either of these
 sides. We could compare the right edge of the query rectangle $r$: if it's on
 the left side of the median line $m$, then so is the left edge of $r$, so we can
-discard the right side of the split. We can't always discard, but we can
-_sometimes_.
+discard the right side of the split (all rectangles to the right of $m$). We
+won't be able to always discard the right side, but we can _sometimes_.
 
-Let's _not_ stop there: not let's split the two subregions using the same process.
+Let's _not_ stop there: now let's split the two subregions using the same process.
 
 <img src="./k_d_tree_02.png" width="50%"/>
 
@@ -753,14 +753,14 @@ This is a binary search with charactersists similar to interval trees and
 segment trees. A flaw of this approach is, once again, bias towards the $x$
 axis. A much better approach would be to alternate the axis: $(x, y, x, y, ...)$
 such that the $2i$<sup>th</sup> level uses the $x$ axis, while the $2i +
-1$<sup>th</sup> level uses the $y$ axis when splitting along the median. Such a
-tree is called a _k-d tree_.
+1$<sup>th</sup> level uses the $y$ axis when sorting and splitting along the
+median. Such a tree is called a _k-d tree_.
 
 The image below shows what that a k-d tree would look like for the previous
 input. The median lines are, in order: red, blue, orange. Line orientation
-alternates. K-d trees aren't completely unbiased, as the initial order
-of the axes affects the final tree. In the right side of the below image,
-the axes are flipped so that the root is split along the $x$ axis etc.
+alternates. K-d trees aren't completely unbiased, as the initial order of the
+axes affects the final tree. In the right side of the below image, the axes are
+flipped so that the splitting starts with the $y$ axis.
 
 <img src='./k_d_tree_proper_01.png' width="49%"/>
 <img src='./k_d_tree_proper_02.png' width="49%"/>
