@@ -872,8 +872,8 @@ change between two consecutive frames. In fact, this would be the best approach
 for a dynamic environment. Many of these data structures, especially R-trees and
 K-d trees, support inserting and removing elements which is in general cheaper
 than reconstructing the entire tree. Let's analyze how much time is spent
-building the data structure over to the total time spent. The charts below plot
-out the behavior.
+building the data structure compared to the total time spent. The charts below
+plot out the behavior.
 
 <img src="./benchmarks/buildSpaceRatioRandom.png" width="49%"/>
 <img src="./benchmarks/buildSpaceRatioRandomLargeBoxes.png" width="49%"/>
