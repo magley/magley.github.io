@@ -818,17 +818,17 @@ FPS and $16ms$ for $60$ FPS.
 
 The first thing to notice is that for $n < 500$, the choice of which strategy to
 use doesn't matter all that much. If your game world can be subdivided into
-smaller rooms such that only one room has collision checking, you can get away
-with not using any broad phase strategy.
+smaller rooms such that in a sinle frame only one room has collision checking,
+you can probably get away with not using any broad phase strategy.
 
 Obviously, we're more interested in how the lines behave as $n \to \infty$. The
 interesting thing (although not that surprising) is that _Sweep and prune_
-outperforms all other data structures, except for the _XLine_ test. This makes
-sense, as the variance along the $x$-axis in that test is very low, so sorting
-and pruning accomplishes nothing. On the other hand, _Sweep and prune_ is
-extremely performant in the _YLine_ test, where the $x$ variance is large. Like
-we've discussed before, this irregular behavior can be remedied by checking
-which axis to use before the algorithm begins. 
+outperforms all other data structures, except for the _XLine_ test. This last
+detail makes sense, as the variance along the $x$-axis in that test is very low,
+so sorting and pruning accomplishes nothing. On the other hand, _Sweep and
+prune_ is extremely performant in the _YLine_ test, where the $x$ variance is
+large. Like we've discussed before, this irregular behavior can be remedied by
+checking which axis to use before the algorithm begins. 
 
 A strange phenomenon is that the _Quad tree_ performs much worse in _YLine_ than
 in _XLine_, even though the quad tree is an unbiased data structure. I first
@@ -871,9 +871,9 @@ frames, making use of the temporal coherence assumption where very little would
 change between two consecutive frames. In fact, this would be the best approach
 for a dynamic environment. Many of these data structures, especially R-trees and
 K-d trees, support inserting and removing elements which is in general cheaper
-than reconstructing the entire tree. In fact, let's analyze how much time is
-spent building the data structure over to the total time spent. The charts below
-plot out the behavior.
+than reconstructing the entire tree. Let's analyze how much time is spent
+building the data structure over to the total time spent. The charts below plot
+out the behavior.
 
 <img src="./benchmarks/buildSpaceRatioRandom.png" width="49%"/>
 <img src="./benchmarks/buildSpaceRatioRandomLargeBoxes.png" width="49%"/>
