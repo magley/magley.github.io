@@ -3,16 +3,33 @@
     <a href="/posts">
         <h1>Blog</h1>
     </a>
+
     <hr/>
 
     <h2>{{ .Params.Title }}</h2>
     {{ with .Params.desc }}
-    <small>{{ . }}</small>
+        <small>{{ . }}</small>
     {{ end }}
-    <br /><br />
+
+    <br />
+    <br />
+
     <div class="date">
         Posted on {{ .Date.Format "January 2, 2006" }}
     </div>
+
+    {{ if .IsTranslated }}
+        <div id="lang-choice">
+            {{ range .AllTranslations }}
+            <a href="{{ .RelPermalink }}">
+                <img 
+                    class="{{ if eq .Language.Lang $.Site.Language.Lang }}active-lang{{ end }}" 
+                    src="/flags/{{.Language}}.png" 
+            /></a>
+            {{ end }}
+        </div>
+    {{ end }}
+
     <hr />
 
     {{ .Content }}
