@@ -3,15 +3,27 @@
     <a href="/files">
         <h1>Files</h1>
     </a>
+    <hr />
     <ul id="list">
         {{ range (.Pages).ByDate.Reverse }}
         <li>
             <div class="item">
-                <a href="{{ .Permalink }}">{{ .Title }}</a>
-                <span class="date">/{{ .Date.Format "Jan 02, 2006" }}</span>
-                {{ with .Params.desc }}
-                <br /> <small class="desc">{{ . }}</small>
-                {{ end }}
+                <table>
+                    <tr>
+                        <td class="l" width="100%">
+                            <a href="{{ .Permalink }}">{{ .Title }}</a>
+                            <span class="date">/{{ .Date.Format "Jan 02, 2006" }}</span>
+                            {{ with .Params.desc }}
+                            <br /> <small class="desc">{{ . }}</small>
+                            {{ end }}
+                        </td>
+                        {{ if .Params.icon}}
+                        <td>
+                            <img src="{{.Path}}/{{.Params.icon}}" width="192">
+                        </td>
+                        {{ end }}
+                    </tr>
+                </table>
             </div>
         </li>
         {{ end }}
