@@ -1,6 +1,7 @@
 ---
 title: Алгоритми и структуре података у широкој фази
 desc: Стабла, сецање и велико O
+icon: _icon.png
 date: 2026-02-26
 math: true
 # draft: true

@@ -1,6 +1,7 @@
 ---
 title: Broad phase algorithms and data structures
 desc: Trees, sweeps and the big O
+icon: _icon.png
 date: 2026-02-26
 math: true
 # draft: true
