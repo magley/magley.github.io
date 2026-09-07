@@ -5,6 +5,19 @@ import shutil
 
 PAGES_DIR = "pages"
 PUBLIC_DIR = ".public"
+
+
+def parse_variables(variables: list[str]) -> dict:
+    d = {}
+    for v in variables:
+        parts = v.split("=")
+        if len(parts) != 2:
+            print("Unknown variable definition:", v)
+        else:
+            d[parts[0]] = parts[1]
+    return d
+
+
 def build_file(path: str, variables={}) -> str:
     contents: str = ''
     with open(path) as f:
@@ -41,6 +54,13 @@ def build_file(path: str, variables={}) -> str:
                     template_path = parts[1]
                     variables = parse_variables(parts[2:])
                     contents2 += build_file(template_path, variables)
+            elif parts[0] == 'var':
+                if len(parts) == 1:
+                    print(f"Don't know what variable to substitute: {cmd}")
+                else:
+                    var_name = parts[1]
+                    default = parts[2] if len(parts) >= 3 else ''
+                    contents2 += variables.get(var_name, default)
         L = R + 2
     return contents2
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ import "./templates/head.html" }}
+
+        {{ import "./templates/blog-meta.html"
+            title="LaTeX thesis template"
+            desc="A LaTeX template for univerity theses"
+            tags="latex, writing"
+            date="2025-04-07"
+            lang="en"
+        }}
+    </head>
+
+    <body>
+        {{ import "./templates/header.html" }}
+
+        <m-2col>
+            {{ import "./templates/sidebar.html" }}
+            
+            <m-body>
+                <h2>LaTeX thesis template</h2>
+                <p>
+                    I wrote this LaTeX template back in college for my bachelors
+                    thesis and I've decided to share it with others. For some
+                    reason my university doesn't have a standard template for
+                    everyone to use. This means that generally everyone uses
+                    Microsoft Word which has a <a
+                    href="https://superuser.com/q/282568">notoriously</a>
+                    <a href="https://www.howtogeek.com/microsoft-word-tired-pretending-doesnt-suck/">bad</a>
+                    <a
+                    href="https://www.reddit.com/r/microsoft/comments/11yp4o0">UX</a>.
+                    <br/> There's not a single task that Word doesn't go out of
+                    its way to make as difficult as possible. It's really
+                    exhausting to use. Meanwhile, the biggest hurdle in LaTeX
+                    are the unhelpful compile errors. I take my sweet time
+                    writing these documents which are full of math equations and
+                    code snippets, so using Word is simply of the question.
+                </p>
+                <p>
+                    Thus, this little LaTeX class was born. It's more or less
+                    just a bunch of packages for code listings, math, support
+                    for Serbian cyrillic script, quality of life improvements
+                    etc. There's also a custom title page macro I painstakingly
+                    designed by eyeballing against the "official" Word template.
+                    The same goes for the page containing key document info,
+                    which is a bit niche and you likely won't need it.
+                    <br/> I'm pretty happy with it even if it isn't anything
+                    special or impressive if you're an experienced user. Still,
+                    it served its purpose.
+                </p>
+                <p>
+                    You can find the template, along with some extra goodies and
+                    an example of usage in
+                    <a href="https://github.com/magley/unsthesis">
+                        this github repo</a>,
+                    or download the <w-c>.cls</w-c> file directly
+                    <a href="https://raw.githubusercontent.com/magley/unsthesis/refs/heads/master/unsthesis.cls">
+                        here</a>.
+                    Should you need some special page with a complex format, it's
+                    probably better to make it in a WYSIWYG editor and import the PDF
+                    output using the <a href="https://www.ctan.org/pkg/pdfpages">pdfpages</a>
+                    package:
+<pre>
+<c-fun>\includepdf</c-fun>{thefile.pdf}
+</pre>
+                    <br/>
+                </p>
+            </m-body>
+        </m-2col>
+
+        {{ import "./templates/footer.html" }}
+    </body>
+</html>
