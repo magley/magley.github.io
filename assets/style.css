@@ -1,0 +1,98 @@
+body {
+    width: 860px;
+    padding: 0.5em;
+    border: 1px solid black;
+}
+
+a, a:visited {
+    color: blue;
+}
+
+m-head {
+    display: block;
+    border: 1px solid black;
+    margin: 0.5em;
+
+    nav {
+        background: linear-gradient(to right, navy, cornflowerblue);
+        padding: 4px;
+        color: white;
+        font-size: 120%;
+        
+        a, a:visited {
+            color: white !important;
+        }
+    }
+}
+
+m-sidebar {
+    display: block;
+    border: 1px solid black;
+    margin: 0.5em;
+}
+
+m-body {
+    display: block;
+    border: 1px solid black;
+    margin: 0.5em;
+    padding: 4px;
+}
+
+m-footer {
+    display: block;
+    border: 1px solid black;
+    margin: 0.5em;
+}
+
+m-2col {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+m-title {
+    display: block;
+    font-weight: bold;
+    background: linear-gradient(to right, white, cornflowerblue);
+    padding: 2px;
+}
+
+/*
+====================================================
+*/
+
+/* Inline highlight (fake-bold) */
+w-b {
+    color: rgb(231, 76, 19);
+}
+
+/* Inline code (monospace) */
+w-c {
+    font-family: monospace;
+    font-size: 1.2em;
+}
+
+p {
+    text-align: justify;
+}
+
+pre {
+    margin: 0;
+    padding: 1em;
+    background-color:aliceblue;
+}
+
+c-fun {
+    color: blue;
+}
+
+c-var {
+    color: brown;
+}
+
+c-str {
+    color: coral;
+}
+
+c-com {
+    color: darkgreen;
+}
