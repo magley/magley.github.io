@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {{ define title "LateX thesis template" }}
+        {{ define desc "A LaTeX template for univerity theses" }}
+        {{ define tags "latex, writing" }}
+        {{ define date "2025-04-07" }}
+        {{ define lang "en" }}
+        
         {{ import "./templates/head.html" }}
 
-        {{ import "./templates/blog-meta.html"
-            title="LaTeX thesis template"
-            desc="A LaTeX template for univerity theses"
-            tags="latex, writing"
-            date="2025-04-07"
-            lang="en"
-        }}
+        {{ import "./templates/blog-meta.html" title="{{ var title }}" desc="{{ var desc }}" tags="{{ var tags }}" date="{{ var date }}" lang="{{ var lang }}" }}
     </head>
 
     <body>
@@ -19,7 +19,7 @@
             {{ import "./templates/sidebar.html" }}
             
             <m-body>
-                <h2>LaTeX thesis template</h2>
+                <h2>{{ var title }}</h2>
                 <p>
                     I wrote this LaTeX template back in college for my bachelors
                     thesis and I've decided to share it with others. For some
