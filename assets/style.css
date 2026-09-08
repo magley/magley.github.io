@@ -91,6 +91,7 @@ pre {
     margin: 0;
     padding: 1em;
     background-color:aliceblue;
+    max-width: 100%;
 }
 
 c-fun {
@@ -107,4 +108,8 @@ c-str {
 
 c-com {
     color: darkgreen;
+}
+
+c-key {
+    color:crimson;
 }

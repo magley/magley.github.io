@@ -8,6 +8,46 @@ PAGES_DIR = "pages"
 PUBLIC_DIR = ".public"
 
 
+def get_define_var(file_path: str, name: str, default: str, variables: dict) -> str:
+    # Slow, and extracted code from parse_content
+
+    contents = ''
+    with open(file_path) as f: contents = f.read()
+
+ 
+    L: int = 0
+    R: int = 0
+
+    while True:
+        oldL = L
+        L = contents.find("{{", L)
+        if L == -1:
+            break
+
+        R = find_next_closing_brace(contents, L)
+        if R == -1:
+            L = R + 2
+            continue
+
+        cmd = contents[L + 2:R].strip()
+        cmd, variables = parse_content(cmd, variables)
+        parts = shlex.split(cmd)
+
+        if len(parts) == 0:
+            pass
+        else:
+            if parts[0] == 'define':
+                if len(parts) <= 2:
+                    print(f"Could not get define name or value: {cmd}")
+                else:
+                    var_name = parts[1]
+                    var_value = parts[2]
+                    if var_name == name:
+                        return var_value
+        L = R + 2
+    return default
+
+
 class HTMLMetaTagParser(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -96,28 +136,28 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
         if len(parts) == 0:
             pass
         else:
-            if parts[0] == 'import':
+            if parts[0] == 'import': # Copy-paste other html file, building it entirely
                 if len(parts) == 1:
                     print(f"Don't know what to import: {cmd}")
                 else:
                     template_path = parts[1]
                     variables_plus_arguments = variables | parse_variables(parts[2:])
                     contents2 += build_file(template_path, variables_plus_arguments)
-            elif parts[0] == 'var':
+            elif parts[0] == 'var': # Get variable, from `define` or as argument from `import`
                 if len(parts) == 1:
                     print(f"Don't know what variable to substitute: {cmd}")
                 else:  
                     var_name = parts[1]
                     default = parts[2] if len(parts) >= 3 else ''
                     contents2 += variables.get(var_name, default)
-            elif parts[0] == 'define':
+            elif parts[0] == 'define': # Define variable, usable from that point to below
                 if len(parts) <= 2:
                     print(f"Don't know name or value of variable: {cmd}")
                 else:
                     var_name = parts[1]
                     var_value = parts[2]
                     variables[var_name] = var_value
-            elif parts[0] == 'meta':
+            elif parts[0] == 'meta': # Get <meta> from specified BUILT html file 
                 if len(parts) <= 2:
                     print(f"Don't know which .html file to use or meta tag: {cmd}")
                 else:
@@ -125,7 +165,14 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
                     meta_tag = parts[2]
                     default = parts[3] if len(parts) >= 4 else ''
                     contents2 += get_meta_tag(html_file_path, meta_tag, default)
-
+            elif parts[0] == "getdefine": # Get value of `define` from specified UNBUILT html file
+                if len(parts) <= 2:
+                    print(f"Don't know which .html file to use or definition var: {cmd}")
+                else:
+                    html_file_path = PAGES_DIR + "/" + parts[1]
+                    meta_tag = parts[2]
+                    default = parts[3] if len(parts) >= 4 else ''
+                    contents2 += get_define_var(html_file_path, meta_tag, default, variables)
         L = R + 2
     return contents2, variables
 
@@ -137,7 +184,6 @@ def build_file(path: str, variables: dict = {}) -> str:
     result, _ = parse_content(contents, variables)
     return result
     
-
 
 def build():    
     try:
