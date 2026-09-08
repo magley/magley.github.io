@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ import "./templates/head.html" }}
+    </head>
+
+    <body>
+        {{ import "./templates/header.html" }}
+
+        <m-2col>
+            {{ import "./templates/sidebar.html" }}
+            
+            <m-body>
+                <h2>Blog</h2>
+                
+                <ul>
+                    <li>
+                        {{ import "./templates/blog-list-item.html" blog="/blog/0001_uni_template.html" }}
+                    </li>
+                </ul>
+
+            </m-body>
+        </m-2col>
+
+        {{ import "./templates/footer.html" }}
+    </body>
+</html>

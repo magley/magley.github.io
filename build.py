@@ -1,10 +1,40 @@
 import os
 import shlex
 import shutil
+from html.parser import HTMLParser
 
 
 PAGES_DIR = "pages"
 PUBLIC_DIR = ".public"
+
+
+class HTMLMetaTagParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.meta = {}
+    
+    def handle_starttag(self, tag, attrs):
+        if tag == 'meta':
+            name = None
+            content = None
+            for attr in attrs:
+                if attr[0] == 'name': name = attr[1]
+                elif attr[0] == 'content': content = attr[1]
+
+            if name is not None and content is not None:
+                self.meta[name] = content
+
+
+def get_meta_tag(file_path: str, meta: str, default: str) -> str:
+    # Slow
+
+    text = ''
+    with open(file_path) as f: text = f.read()
+
+    parser = HTMLMetaTagParser()
+    parser.feed(text)
+
+    return parser.meta.get(meta, default)
 
 
 def find_next_closing_brace(text: str, start_pos: int) -> int:
@@ -81,13 +111,20 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
                     default = parts[2] if len(parts) >= 3 else ''
                     contents2 += variables.get(var_name, default)
             elif parts[0] == 'define':
-                if len(parts) == 2:
+                if len(parts) <= 2:
                     print(f"Don't know name or value of variable: {cmd}")
                 else:
                     var_name = parts[1]
                     var_value = parts[2]
                     variables[var_name] = var_value
-                    print(var_name, " ", var_value)
+            elif parts[0] == 'meta':
+                if len(parts) <= 2:
+                    print(f"Don't know which .html file to use or meta tag: {cmd}")
+                else:
+                    html_file_path = PUBLIC_DIR + "/" + parts[1]
+                    meta_tag = parts[2]
+                    default = parts[3] if len(parts) >= 4 else ''
+                    contents2 += get_meta_tag(html_file_path, meta_tag, default)
 
         L = R + 2
     return contents2, variables
