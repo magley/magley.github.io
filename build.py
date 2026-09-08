@@ -71,8 +71,8 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
                     print(f"Don't know what to import: {cmd}")
                 else:
                     template_path = parts[1]
-                    variables |= parse_variables(parts[2:])
-                    contents2 += build_file(template_path, variables)
+                    variables_plus_arguments = variables | parse_variables(parts[2:])
+                    contents2 += build_file(template_path, variables_plus_arguments)
             elif parts[0] == 'var':
                 if len(parts) == 1:
                     print(f"Don't know what variable to substitute: {cmd}")
