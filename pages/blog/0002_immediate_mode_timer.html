@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ define title "Immediate mode timer in games" }}
+        {{ define description "A common and useful game dev pattern" }}
+        {{ define tags "game dev" }}
+        {{ define date "2025-10-23" }}
+        {{ define lang "en" }}
+        
+        {{ import "./templates/head.html" }}
+        {{ import "./templates/blog-meta.html" }}
+        <link rel="stylesheet" href="/assets/pygmentize_sas.css" />
+    </head>
+
+    <body>
+        {{ import "./templates/header.html" }}
+
+        <m-2col>
+            {{ import "./templates/sidebar.html" }}
+            
+            <m-body>
+                {{ import "./templates/blog-heading.html" }}
+                <p>
+                    A common thing in game development is "do something after X seconds".
+                    Most game engines make this task trivial:
+                </p>
+                    <ul>
+                        <li>
+                            In Unity, you use coroutines:
+
+                            {{ code C# 
+bool canGetHit = true;
+
+void OnGetHit() {
+    StartCoroutine(BecomeInvincible(5.0f));
+}
+
+IEnumerator BecomeInvincible(float time) {
+    canGetHit = false;
+    yield return new WaitForSeconds(time);
+    canGetHit = true;
+} 
+                            }}
+
+                            ... but they're handled separately from your game logic.
+                        </li>
+                        <li>
+                            In Godot, it's the Timer node:
+
+                            {{ code gdscript
+var can_get_hit: bool = true
+
+func on_get_hit():
+    become_invincible(5.0)
+
+
+func become_invincible(time: float):
+    can_get_hit = false
+    var timer = get_tree().create_timer(time)
+    timer.timeout.connect(_on_timer_timeout)
+
+
+func _on_invicible_timer_timeout():
+    can_get_hit = true              
+                            }}
+
+                            ... but then the timer runs in a separate node, away from your script.
+                        </li>
+                        <li>
+                            In Unreal Engine 5, there's the TimerManager:
+
+                            {{ code c++   
+void MyActor::OnGetHit() {
+    BecomeInvincible(5.0f);
+}
+
+void MyActor::BecomeInvincible(float time) {
+    canGetHit = false;
+    GetWorldTimerManager().SetTimer(
+        invincibilityTimer, this, &YourClass::OnGetHit, time, false
+    );
+}
+
+void MyActor::OnInvincibilityTimerEnd() {
+    canGetHit = true;
+}
+                            }}
+
+                            ... but then the timer is handled by the engine.
+                        </li>
+                        <li>
+                            GameMaker uses alarms which are also handled by the engine and so on.
+                        </li>
+                    </ul>
+            </m-body>
+        </m-2col>
+
+        {{ import "./templates/footer.html" }}
+    </body>
+</html>

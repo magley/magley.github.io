@@ -2,6 +2,9 @@ import os
 import shlex
 import shutil
 from html.parser import HTMLParser
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
 
 
 PAGES_DIR = "pages"
@@ -129,7 +132,7 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
             L = R + 2
             continue
 
-        cmd = contents[L + 2:R].strip()
+        cmd: str = contents[L + 2:R].strip()
         cmd, variables = parse_content(cmd, variables)
         parts = shlex.split(cmd)
 
@@ -173,6 +176,15 @@ def parse_content(contents: str, variables: dict = {}) -> (str, dict):
                     meta_tag = parts[2]
                     default = parts[3] if len(parts) >= 4 else ''
                     contents2 += get_define_var(html_file_path, meta_tag, default, variables)
+            elif parts[0] == "code": # Syntax highlighting
+                if len(parts) <= 3:
+                    print(f"Don't know which language to use or what the code is: {cmd}")
+                else:
+                    lang = parts[1]
+                    code: str = cmd.split(None, 2)[2]
+
+                    contents2 += highlight(code, get_lexer_by_name(lang), HtmlFormatter())
+
         L = R + 2
     return contents2, variables
 
