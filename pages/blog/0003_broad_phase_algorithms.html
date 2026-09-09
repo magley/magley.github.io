@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ define title "Broad phase algorithms and data structures" }}
+        {{ define description "Making collision detection faster" }}
+        {{ define tags "game dev, dsa" }}
+        {{ define date "2026-02-26" }}
+        {{ define lang "en" }}
+        
+        {{ import "./templates/head.html" }}
+        {{ import "./templates/blog-meta.html" }}
+        <link rel="stylesheet" href="/assets/pygmentize_sas.css" />
+    </head>
+
+    <body>
+        {{ import "./templates/header.html" }}
+
+        <m-2col>
+            {{ import "./templates/sidebar.html" }}
+            
+            <m-body>
+                {{ import "./templates/blog-heading.html" }}
+                
+                <p>
+                    An important part of game engines and various geospatial
+                    software is the notion of overlap between objects. Objects
+                    are represented using data (in games entities have a
+                    position and a collision shape, while in databases entities
+                    are multimodal data points). We want to find collision
+                    between these objects, or to search for nearest neighors of
+                    any single object.
+                </p>
+                <p>
+                    The obvious approach is to scan every pair (or every
+                    <i>n</i>-tuple). That's too slow for real use cases, and so
+                    we need to find a way to quickly prune false negatives or
+                    group potential candidates together. I will cover some of
+                    these solutions in this blog post.    
+                </p>
+                <p>
+                    If you just want the results, skip to <a href="#benchmark-results">here</a>.    
+                    The source code for all the implementations can be found in 
+                    <a href="https://github.com/magley/broad-phase">this github repo</a>.
+                </p>
+                <h3>Metric spaces</h3>
+                <p>
+                    I want to make this blog post a little math-y, so I'll
+                    formalize a lot of things on here. Bear with me, as I bite
+                    off more than I can chew.
+                </p>
+                <p>
+                    A metric space is a set of objects <i>M</i>, which can be
+                    anything, and a distance function
+                    <i>d:M &times; M &rarr; R</i>. So if you have a set of any
+                    thing of some type, and you can define a "distance" between
+                    any two things, you've got a metric space. The distance
+                    function is called a metric, and you use this metric to
+                    measure things beyond the distances between two objects in
+                    the set. The metric must satisfy these properties:
+
+                    <ul>
+                        <li><w-b>p.1</w-b> <i>d(x,x) = 0</i></li>
+                        <li><w-b>p.2</w-b> <i>d(a,b) = d(b,a)</i></li>
+                        <li><w-b>p.3</w-b> <i>d(a,b) &gt; 0, a &ne; b</i></li>
+                        <li><w-b>p.4</w-b> <i>d(a,b) + d(b,c) &ge; d(a,c)</i></li>
+                    </ul>
+                </p>
+                <p>
+                    The Euclidean space is a classic example of a metric space.
+                    It's how we model the world, it's what games use, and it's
+                    what we normally think of when we say "space":
+                </p>
+                <img src="/assets/blog/0003/metric_space.png" />
+                <p>
+                    In more complicated scenarios where you have data of
+                    different type and none of them represent position in real
+                    space, you have to get creative. But as long as you can
+                    measure the distance between these two objects and this
+                    measure satisfies the above properties, it's a metric space,
+                    no matter how unintuitive the measure function itself may
+                    be.
+                    <br/> I'll only be talking about Euclidean spaces here
+                    because that's what games use.
+                </p>
+                <p>
+                    What does <w-b>intersection</w-b> mean in the context of
+                    metric spaces? All elements in a metric space are points so
+                    they don't have a shape. Without a shape, we can't talk
+                    about intersection. And also, we know overlap of two
+                    distinct points is not possible because
+                    <i>(p.1) d(a,b)=0 &rArr; a=b</i>. We cannot operate using
+                    metric spaces alone, so let's define shape. A
+                    <w-b>ball</w-b> <i>B</i> of radius <i>r</i> centered at
+                    point <i>c</i> is a subset of the metric space defined like
+                    so:
+                </p>
+                <w-center>
+                    B(c,r) = {x&in;M &VerticalLine; d(c,x) &lt; r}
+                </w-center>
+                <p>
+                    A <w-b>line segment</w-b> is a set of points which we can
+                    define with a parametric equation:
+                </p>
+                <w-center>
+                    L(a,b) = {(1 &minus; t)a &plus; tb &VerticalLine; t &in; [0,1]}
+                </w-center>
+                <p>
+                    See the image below. I didn't even touch up on the subject
+                    of boundaries: a ball may or may not include its boundary
+                    (<i>d(c,x) &le; rd(c,x) &le; r or d(c,x) &lt; rd(c,x) &lt;
+                    r</i>). Usually balls are "open" meaning the boundary isn't
+                    a part of the ball itself. But for our line definition, we
+                    said <i>t &in; [0,1]</i> which includes the endpoints
+                    <i>a</i> and <i>b</i>. In practice (in games), we don't use
+                    continuous spaces because of natural limitations of
+                    hardware, so this problem is eliminiated by sacrificing
+                    precision.
+                </p>
+                <img src="/assets/blog/0003/metric_ball_line.png" />
+                <p>
+                    <w-b>Polygons</w-b> are tricky: we start with a union of
+                    line segments such that each endpoint belongs to exactly 22
+                    line segments (like a closed chain):
+                </p>
+                <w-center>
+                    P(p1,p2,&hellip;,p<sub>n</sub>) = L(p1,p2) &Union; L(p2,p3) &Union; &hellip; &Union; L(p<sub>n&minus;1</sub>,p<sub>n</sub>)
+                </w-center>
+                <p>
+                    That's only for the polygon boundary; what about the
+                    <w-b>polygon interior</w-b>? Well, we need to define what an
+                    interior is. Take a look at the image below:
+                </p>
+                <img src="/assets/blog/0003/metric_polygon_boundary.png" />
+                <p>
+                    Why do we know that the shaded area is the interior of
+                    <i>P(a,b,c,d,e)</i>? There isn't enough information right
+                    now to make this assumption. Jordan curve theorem states
+                    that an interior and exterior will always exist, but
+                    determining which is which is up to us. This is where the
+                    concept of orientation comes in. Normally we define all
+                    points in a clockwise or counter clockwise order. Once we do
+                    that, a polygon with its interior can be defined as:
+                </p>
+                <w-center>
+                    P(p1,p2,&hellip;p<sub>n</sub>) = { k1p1 + k2p2 + &hellip; k<sub>n</sub>p<sub>n</sub> &ge; 0 &VerticalLine; &Sum;<sub>i=1</sub><sup>n</sup> nk<sub>i</sub> = 1 }
+                </w-center>
+                <p>
+                    ... which is just a generalization of the line segment definition.
+                </p>
+                <p>
+                    <w-b>Intersection of shapes</w-b> becomes intersection of
+                    sets. There is an intersection between shapes <i>A</i>A and
+                    <i>B</i> if <i>A &Intersection; B &ne; &emptyset;</i>. We
+                    can't compute these set intersections because there is an
+                    infinite amount of points in any shape. Instead, we rely on
+                    analytic solutions or clever vector formulas to come to a
+                    conclusion. Determining the intersecting region in the
+                    general sense is not possible (for polygons we could use
+                    clipping algorithms), but that's not an issue because in
+                    game physics we only care about the normal vector of the
+                    intersection, the depth of the intersection projected along
+                    that normal vector, and a finite set of clipping points (in
+                    2D it's usually 2 points at most). This is a topic for
+                    narrow phase collision, though.
+                </p>
+                <p>
+                    All this talk about metric spaces, and yet the rest of this
+                    article will deal with vectors, trees and a bunch of if
+                    statements, so why bother? I wanted to help build an
+                    intuition on how these algorithms and data structures came
+                    to be. Much of the work here can be visualized and the
+                    correctness of this visualiation depends on understanding
+                    first principles which, in this article, are metric spaces.
+                    By formalizing what's otherwise considered common sense, we
+                    can eliminate hand-wavy logic. Just by having you think
+                    about what happens when shapes become infinitely big or
+                    small, or what happens when two shapes are infinitely far
+                    away, you can start to appreciate why the assumptions are
+                    valid, or at the very least feel valid. Whether this matters
+                    is up to you, though. Hence why this section is optional.
+                </p>
+            </m-body>
+        </m-2col>
+
+        {{ import "./templates/footer.html" }}
+    </body>
+</html>

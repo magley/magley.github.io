@@ -83,6 +83,11 @@ w-c {
     font-size: 1.2em;
 }
 
+w-center {
+    display: block;
+    text-align: center;
+}
+
 p {
     text-align: justify;
 }
