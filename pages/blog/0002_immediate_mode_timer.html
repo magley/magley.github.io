@@ -92,6 +92,138 @@ void MyActor::OnInvincibilityTimerEnd() {
                             GameMaker uses alarms which are also handled by the engine and so on.
                         </li>
                     </ul>
+
+                    <p>
+                        The problem is that in all of these approaches you can
+                        only create the timer, but their <w-b>control</w-b> is
+                        taken away from you. You don't know when they'll tick
+                        (relative to your script), you rely on the engine's API
+                        to control the tempo of those ticks, and querying the
+                        progress (%) of the timer is difficult or impossible. In
+                        some engines, you have to use a callback so you're
+                        essentially forced to split your code up.
+                        <br/> It's not a user-friendly API. It gets in your way
+                        far too often and you still end up with tons of
+                        <w-b>boilerplate</w-b> code just to have a couple of
+                        timers.
+                    </p>
+                    <p>
+                        Wouldn't it be much better if the timer updating logic
+                        was right there in your code, invoked exactly when you
+                        need it to?
+                    </p>
+
+                    {{ code d
+Timer invincibility_timer = Timer(5.0f);
+bool can_get_hit = true;
+
+void update() {
+    if (invincibility_timer.update(Game::delta_time)) {
+        can_get_hit = true;
+    }
+}
+
+void on_get_hit() {
+    can_get_hit = false;
+    invincibility_timer.reset();
+}
+                    }}
+
+                    <p>
+                        So, you explicitly tick the timer using
+                        <code>update()</code>, and the function returns
+                        <code>true</code> only on the exact frame it reaches 0.
+                        <w-b>What is gained from this?</w-b> Well, games are
+                        made up of many small moving parts. Scripting your game
+                        logic is difficult because you have to predict various
+                        scenarios where two contradicting pieces of code are
+                        running concurrently (this issue comes up in other
+                        fields too, which gave rise to the shortly-lived
+                        Knowledge Based Systems).
+                        <br/><w-b>And what is lost?</w-b> Keeping track of all
+                        the timers is annoying. You have to define their
+                        variables ahead of time (or use an implicitly available
+                        hash map). The place where you start the timer is not
+                        the place where you'll update and respond to it. This
+                        means you'll have at least two parts of code to think
+                        about when dealing with a single timer. If you need a
+                        "one and done" type of timer where you really don't care
+                        about its state, then you should use whichever mechanism
+                        your engine provides. 
+                    </p>
+
+                    <p>
+                        See below for an implementation of the timer in a C++-like
+                        pseudocode:
+                    </p>
+
+                    {{ code d
+struct Timer {
+    float current, start;
+
+    Timer(float start_seconds) {
+        start = start_seconds;
+        current = start;
+    }
+
+    bool update(float dt) {
+        current -= dt;
+        if current <= 0 {
+            current = 0;
+            return true;
+        }
+        return false;
+    }
+
+    void reset() { 
+        current = start; 
+    }
+
+    void reset_with(float new_start_seconds) {
+        start = new_start_seconds;
+        reset();
+    }
+};              
+                    }}
+
+                    <p>
+                        The reason it's called an <w-b>immediate mode timer</w-b>
+                        is because the user owns the timer's state and directly
+                        responds to its "events" (ticking finished).
+                        <br/> You can use this timer struct for arbitrary
+                        countdowns (like ammo, so each update would decrement by
+                        1) etc. Creating a timer that loops every N seconds is
+                        easy:
+                    </p>
+
+                        {{ code d
+Timer spawn_enemy_timer;
+void update() {
+    if (spawn_enemy_timer.update(dt)) {
+        spawn_enemy_timer.reset();
+        // spawn enemy
+    }
+}                       
+                        }}
+
+                    <p>
+                        The order of operations in your game logic very
+                        important, so by letting you decide when and where to
+                        update the timers, you can be sure that event A won't
+                        accidentally "override" event B just because A's timer
+                        was started first. This may seem like a trivial thing,
+                        but whenever you're doing something like complex
+                        interaction between entities, it's crucial to get your
+                        logic in order, or else the enemy will incorrectly kill
+                        the player first before the player gets a chance!
+                    </p>
+                    <p>
+                        Nothing about this is novel, in fact many game
+                        programmers discover this pattern themselves. So having
+                        a formal data type ready comes in handy. Game engines
+                        should support these timers out of the box due to how
+                        ubiquitous they are.
+                    </p>
             </m-body>
         </m-2col>
 
