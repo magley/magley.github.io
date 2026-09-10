@@ -461,6 +461,185 @@
                     the case in most video games), then the amortized running
                     time for sweep and prune is &Oscr;(n).
                 </p>
+                <h3>Grid hashing</h3>
+                <p>
+                    One important property of shapes in a metric space
+                    (M,d)(M,d) is that two shapes are more likely to be
+                    intersecting the closer they get, or more formally:
+                </p>
+                <w-center>
+                    lim<sub>d(A,B)&rarr;0</sub> P(A&cap;B&ne;&emptyset;)=1
+                </w-center>
+                <p>
+                    This only works with convex shapes (think of a circle inside
+                    a donut hole and why that wouldn't work), but we're dealing
+                    with rectangles so the above property holds. This is
+                    important because it implies that collision candidates at
+                    the very least should be objects that are naturally close to
+                    each other. However, it's not sufficient to rely on this
+                    verbatim: think of a rectangle with infinite width and
+                    infinite distance from our reference rectangle. We need to
+                    look at not just the center point of a shape, but its
+                    boundary points as well. For AABB rectangles, there are 4
+                    points for each shape.
+                </p>
+                <p>
+                    <w-b>Grid hashing</w-b> divides the space into a uniform
+                    grid where each cell is a bucket. For each rectangle R, we
+                    include R once in every bucket containing at least one of
+                    the vertices of R. Collision can happen only between
+                    rectangles in the same bucket. Take a look at this image:
+                </p>
+                <img src="/assets/blog/0003/grid_hash_example.png" width="100%">
+                <p>
+                    The left side shows the grid and a 8 rectangles (each of
+                    which is labeled). The right side shows the grid and inside
+                    each cell there's a list of labels representing which
+                    rectangles are included in that cell. For each cell, we
+                    check for collision between rectangles in that cell's
+                    bucket.
+                </p>
+                <p>
+                    What are the speedup gains? Well, the naive approach would
+                    take 28 comparisons, while here we only have 8. Furhtermore,
+                    since we don't allow duplicate collisions, this is reduced
+                    to 7.
+                </p>
+                <p>
+                    Grid hashing can be implemented using hash tables and
+                    tilesets. A hash table approach is more flexible but can
+                    result in hash collisions so it's a bit slower. A good hash
+                    function can be
+                    h(x,y)=xp<sub>1</sub>&CirclePlus;yp<sub>2</sub>
+                    mod n where p<sub>1</sub> and p<sub>2</sub> are prime
+                    numbers and n is the hash table size; or alternatively using
+                    Morton's space filling curve. Tilesets have a fixed range
+                    but hashing is precise and fast since it's a 2D matrix.
+                </p>
+                <p>
+                    Do you notice a problem with this approach? Look at the
+                    above image, specifically rectangle 2, and how it might
+                    miss certain collisions. Here's a more clear example:
+                </p>
+                <img src="/assets/blog/0003/grid_hash_issue.png">
+                <p>
+                    A shape that spans across more than two grid cells will not
+                    be included in the middle cells' buckets. In the above
+                    image, rectangles 1 and 2 intersect in the middle cell,
+                    but neither of them has an endpoint in that cell, so we lose
+                    information.
+                </p>
+                <p>
+                    Cell size is a hyperparameter, and grid hashing only works
+                    if all shapes are smaller than a cell (in all axes). If we
+                    know ahead of time that there's a maximum size for bounding
+                    volumes, this isn't an issue. If we don't know, then we can
+                    scan through all the objects ahead of time and determine the
+                    largest one. This is fine, but if there isn't an upper bound
+                    on the objects' sizes, then the cell size can grow
+                    indefinately which results in diminished performance gains.
+                </p>
+                <p>
+                    An adaptive approach where the cell size isn't uniform is
+                    what we need. To do that, a hierarchical representation of
+                    the metric space is required, and this is done using trees.
+                </p>
+                <h3>Quad tree</h3>
+                <p>
+                    <w-b>Quad trees</w-b> are a spatial data structure used to
+                    segment 2D space. The 3D analog is the oct tree, and it
+                    works the same way.
+                </p>
+                <p>
+                    A <w-b>node</w-b> in the quad tree is a rectangle
+                    representing some area in space. Objects are added to the
+                    node until the node's capacity is reached. When that
+                    happens, the node splits into 4 children, and each object of
+                    the node is passed to the child whose area intersects with
+                    the object. This process repeats recursively, or until a
+                    node reaches a certain minimum size after which splitting is
+                    no longer possible. Leaf nodes of the quad tree are buckets
+                    containing collision candidates.
+                </p>
+                <p>
+                    The image below demonstrates a quad tree. The left side
+                    shows the measurable space and all bounding boxes of the
+                    objects. Each object is labeled from 1 to 7. A grid is drawn
+                    representing the quad tree split. The right side illustrates
+                    the quad tree structure itself. We assume that the capacity
+                    of any node is 2. At the top of the tree is the root node,
+                    spanning the entire space. Because there are 7>2 objects
+                    covering the root node, a split occurs, and each child
+                    (top-left, top-right, bottom-left, bottom-right) is 1/4 the
+                    area of its parent node. Leaf nodes are shaded and labels of
+                    objects spanning the leaf are written underneath. The
+                    bottom-right child of the root splits once again.
+                </p>
+                <img src="/assets/blog/0003/quad_tree.png" width="100%">
+                <p>
+                    There are 5 comparisons made in total (4 if you discount
+                    duplicates), compared to the brute force solution requiring
+                    21 comparisons. How well a quad tree performs depends on the
+                    capacity hyperparameter. Intuitively, we'd want to set it to
+                    a value c that maximizies the performance gain
+                    n<sup>2</sup>&minus;(n/c) c<sup>2</sup> and minimizes
+                    necessary work n/c c<sup>2</sup>=nc.
+                </p>
+                <p>
+                    Quad trees adapt well to cases where we have local clusters
+                    of objects as well as empty space between these clusters.
+                    The memory footprint of empty space is minimal. Compared to
+                    grid hashing, quad trees don't suffer from objects spanning
+                    more than two cells (nodes) in either direction, because
+                    there's an inversion of control happening here: in grid
+                    hashing, it's the object deciding which buckets its belongs
+                    to; in quad trees, it's the nodes themselves deciding which
+                    objects belong to its bucket.
+                </p>
+                <p>
+                    Unfortunately, quad trees come with several drawbacks.
+                    <br/> (1) First, they're designed for <w-b>particles</w-b>
+                    (no shape). Notice how in the picture above, a single object
+                    is contained in multiple buckets. This can degenerate into
+                    the naive approach, but such cases are rare. That said,
+                    duplicates are extremely common and bring degradataion
+                    performance when constructing trees since the probability of
+                    a node split increases.
+                    <br/> (2) Second, the previously mentioned <w-b>capacity
+                    hyperparameter <i>c</i></w-b> can make or break broad phase
+                    optimization. If your game guarantees a sane distribution of
+                    elements across space, c is easy to compute. If the objects
+                    are large and cc is small, you'll quickly end up with a
+                    complete tree, split to the very end. At that point, quad
+                    trees behave like grid hashing, with the added overhead of
+                    constructing the tree.
+                    <br/> (3) Third, you have to specify the <w-b>space
+                    size</w-b> ahead of time. This may seem like a non issue,
+                    especially because you can certainly compute these bounds in
+                    O(n) for each frame, but it makes any attempt at clever
+                    optimization of c impossible. Not only that, but you have to
+                    decide the minimum allowed node size beyond which splitting
+                    isn't allowed.
+                </p>
+                <p>
+                    Let's take a step back and reason about where these issues
+                    with quad trees come from. You are taking a fixed chunk of
+                    space and splitting into a non-uniform grid. You are
+                    requiring objects to conform to this grid, no matter where
+                    they are positioned. Constructing a quad tree seems clever
+                    because at no point does the tree have to think which node
+                    to pass an object along, it's a matter of "you crossed this
+                    line, so at the very least you go here". The tree is
+                    constructed according to the space, which is constant,
+                    instead of according to the objects, whose positions and
+                    shapes are ephemeral.
+                </p>
+                <p>
+                    Quad trees optimize for the wrong measure: the density of
+                    objects in a unit of space. Instead, trees should infer
+                    their shape and structure based on the objects' natural
+                    measures, and that's what R-trees do.
+                </p>
             </m-body>
         </m-2col>
 
