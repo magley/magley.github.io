@@ -821,6 +821,457 @@
                     in the topmost level, so it has to be the root and the
                     algorithm is finished.
                 </p>
+                <img src="/assets/blog/0003/rtree_nearest_x_01.png" width="48%">
+                <img src="/assets/blog/0003/rtree_nearest_x_02.png" width="48%">
+                <br/>
+                <img src="/assets/blog/0003/rtree_nearest_x_03.png" width="48%">
+                <img src="/assets/blog/0003/rtree_nearest_x_04.png" width="48%">
+                <p>
+                    We don't have to sort the nodes themselves. If the objects
+                    are sorted by their centroid, then all later encompassing
+                    nodes, effectively convex hulls, will have their centroids
+                    also ordered. The time complexity is O(nlogn+nd), where
+                    d&approx;log<sub>k</sub>n is the tree depth.
+                </p>
+                <p>
+                    Nearest-X works well in general cases, but its performance
+                    depends on the x-distribution of the objects. Sorting on
+                    the xx axis will usually result in a tree where each node is
+                    narrow but tall. While the compactness improves performance,
+                    the large perimiter of each node lowers the performance of
+                    region queries. Furthermore, the degenerate case is when all
+                    the objects' centroids align on the x-axis. We could
+                    circumvent this by doing a linear pass and determining the
+                    axis with the greater variance on which the sorting should
+                    occur.
+                </p>
+                <p>
+                    <w-b>Sort-Tile-Recursive</w-b> improves upon Nearest-X by
+                    attempting to group objects on the y-axis as well. While
+                    Nearest-X sorts the objects only along the x-axis,
+                    Sort-Tile-Recursive uses a more advanced approach:
+                </p>
+                <ol>
+                    <li>Sort all the objects along the x axis.</li>
+                    <li>For each slice of size &lceil;&Sqrt;<span style="text-decoration:overline;">(n/k)</span>&rceil;, sort the
+                    objects along the y axis.</li>
+                </ol>
+                <p>
+                    The idea here is to sort by xx and yy at the same time, but
+                    because there's no natural ordering of two-dimensional data,
+                    we approximate the other axis. What this does is it
+                    effectively tries to group objects into a tile grid.
+                </p>
+                <p>
+                    See the image below for an example (n=16,k=5n=16,k=5). In
+                    top-left, the rectangles have been sorted along the x-axis
+                    by their centroid, and labelled. The sorted list is grouped
+                    into slices of size &lceil;16/5&rceil;=2 as shown in the
+                    top-right, slices being represented by colors of their
+                    objects. Each slice object is sorted along the yy axis and
+                    the new labels are shown in bottom-left. Finally, we group
+                    the objects into k segments just like in Nearest-X,
+                    resulting in the nodes shown in the bottom-right image
+                    (A,B,C,D). The algorithm then repeats (create
+                    &lceil;4/5&rceil; slices, group into k etc.) until we arrive
+                    at the root node.
+                </p>
+                <img src="/assets/blog/0003/rtree_str_01.png" width="48%">
+                <img src="/assets/blog/0003/rtree_str_02.png" width="48%">
+                <br/>
+                <img src="/assets/blog/0003/rtree_str_03.png" width="48%">
+                <img src="/assets/blog/0003/rtree_str_04.png" width="48%">
+                <p>
+                    This is better, but there's still a bias towards x
+                    distribution because of how the sorting function compares
+                    rectangles. If we could come up with a heuristic function
+                    f:&Ropf;<sup>2</sup>&rarr;&Ropf; which treats both axes
+                    equally, we could eliminate this problem.
+                </p>
+                <h3>Space filling curves</h3>
+                <p>
+                    Time for some more math. I've discussed that a metric space
+                    is a set of objects coupled with a distance function. This
+                    idea of a "set with some operations" is known as an
+                    <c-b>alegbraic structure</c-b> and is studied in abstract
+                    algebra. Other algebraic structures are groups, fields,
+                    rings, lattices etc.
+                </p>
+                <p>
+                    Metric spaces are a bit special, because they are not pure
+                    algebraic structures, as they have a non-algebraic structure
+                    borrowed from topology. The Euclidean 2D metric space is
+                    isomorphic to the vector space of complex numbers &Copf;.
+                    This just means that certain properties of complex numbers
+                    also hold for 2D Euclidean spaces.
+                </p>
+                <p>
+                    Specifically, there is no total order on &Copf;, which is to
+                    say that you can't order complex numbers in such a way that
+                    no contradictions arise when also comparing the
+                    sums/products of complex numbers. The Euclidean 2D metric
+                    space also has no total order as it is not compatible with
+                    the topology of the metric space. An explanation on why this
+                    is the case is a bit tricky, but a simplified version is
+                    that any ordering of 2D numbers does not generate a space
+                    that's compatible with Euclidean 2D space (neighborhoods
+                    stop being balls).
+                </p>
+                <p>
+                    The X-sort and Sort-Tile-Recurse generate a non-Euclidean
+                    topology, which is why these algorithms are imperfect. The
+                    crux of this imperfection, like I've said, is bias towards
+                    one axis. What if there was a way to order points such that
+                    both axes contributed just as likely?
+                </p>
+                <p>
+                    Enter <c-b>space filling curves</c-b>. A space filling curve
+                    is a function that maps a unit range onto a unit
+                    n-dimensional cube:
+                </p>
+                <w-center>
+                    f:[0,1]&rarr;[0,1]<sup>n</sup>
+                </w-center>
+                <p>
+                    Imagine you were tasked to draw a single line from the
+                    bottom-left corner of a sheet to paper to the top-right
+                    corner of a sheet of paper, covering the entire paper,
+                    without lifting your pen off the paper. Visually, a space
+                    filling curve would then map your progress so that f(0)
+                    is the moment you begin, and f(1) is the moment you
+                    finish.
+                </p>
+                <p>
+                    Many space filling curves are fractals, like the Peano curve
+                    (left) and Hilbert curve (right). That's helpful because the
+                    functions can be expressed recursively and thought about
+                    through iterations. The two images below are not the Peano
+                    and Hilbert curves, because they're not really filling up
+                    the entire space. They're the 3rd iteration of their curves.
+                    Each successive iteration fills up more space, so when
+                    iter&rarr;&infin;, the curve truly does fill up the entire space
+                    of a unit square.
+                </p>
+                <img src="/assets/blog/0003/space_filling_curves.png" width="70%"/>
+                <p>
+                    Why is this important? Because the inverse space filling
+                    curve maps points to the real numbers which gives us a
+                    ordering.
+                </p>
+                <w-center>
+                    f<sup>-1</sup>:[0,1]<sup>n</sup>&rarr;[0,1]
+                </w-center>
+                <p>
+                    This ordering still isn't total, but there's no bias towards
+                    either axis. If we could sort our rectangles using an
+                    inverse space filling curve, we could improve upon the
+                    previous bulk-loaded R-trees.
+                </p>
+                <h3>Hilbert R-tree</h3>
+                <p>
+                    The <c-b>Hilbert R-tree</c-b> is a bulk loading mechanism
+                    for R-trees, similar to Nearest-X and Sort-Tile-Recursive.
+                    Rectangles are sorted according to the Hilbert value
+                    (inverse Hilbert space filling curve) of their centroids.
+                    The rest of the algorithm groups objects in the same way as
+                    Nearest-X.
+                </p>
+                <p>
+                    Since space filling curves are continuous, we cannot
+                    represent them accurately in computers. Computing the
+                    Hilbert value of a 2D point thus approximates the true
+                    value. In this case, the space is segregated in an imaginary
+                    grid, and the Hilbert value of a point is the index of the
+                    grid cell containing the point, where the cells are ordered
+                    along the Hilbert curve pattern.
+                </p>
+                <p>
+                    The result is not a real number in [0,1], but an integer in
+                    [0,2k] where k is the precision of the Hilbert curve
+                    approximation. This parameter is usualy bounded to 32 or 64,
+                    as the algorithm for computing the Hilbert value relies on
+                    bit manipulation. All the points in the metric space must be
+                    in the range [0,2k&rpar; on both axes, and so the space has
+                    to be scaled beforehand.
+                </p>
+                <p>
+                    The resulting Hilbert R-tree usually looks like a hierarchy
+                    of non-uniform grid cells. This goes back to earlier where
+                    we touched upon the drawbacks of Grid hashing. The
+                    complexity of constructing a Hilbert R-tree is
+                    O(nlogn+nd+nk), as each rectangle is mapped to a Hilbert
+                    value in O(k) only once (Schwartzian transform).
+                </p>
+                <h3>K-d trees</h3>
+                <p>
+                    In the naive approach section, I briefly touched upon an
+                    idea of splitting the entire space into two different
+                    subregionns and by doing that, we were able to reduce the
+                    total number of computations. The method of splitting
+                    assumed there were two disjoint clusters of rectangles,
+                    which isn't always the case. While that wasn't a practical
+                    solution, the idea of splitting a region into two could be
+                    utilized in a different way.
+                </p>
+                <p>
+                    If we split the rectangles by their median element (median
+                    of sorted rectangles on one axis), then we could easily
+                    discard half of the elements when querying any one rectangle
+                    for collision. For example, let's sort along the rectangles
+                    by their right edge and draw a line along the median:
+                </p>
+                <img src="/assets/blog/0003/k_d_tree_01.png" width="70%"/>
+                <p>
+                    To query any rectangle, we need to determine how to discard
+                    either of these sides. We could compare the right edge of
+                    the query rectangle r: if it's on the left side of the
+                    median line mm, then so is the left edge of r, so we can
+                    discard the right side of the split (all rectangles to the
+                    right of m). We won't be able to always discard the right
+                    side, but we can <i>sometimes</i>.
+                </p>
+                <p>
+                    Let's not stop there: now let's split the two subregions
+                    using the same process.
+                </p>
+                <img src="/assets/blog/0003/k_d_tree_02.png" width="70%"/>
+                <p>
+                    This time around, some rectangles intersect the median line,
+                    which is why cant always know for certain if one of the two
+                    sides can be discarded when querying. We can repeat this
+                    process until we are left with 1 rectangle in the
+                    subregion.
+                </p>
+                <img src="/assets/blog/0003/k_d_tree_03.png" width="70%"/>
+                <p>
+                    This is a binary search with characteristics similar to
+                    interval trees and segment trees. A flaw of this approach
+                    is, once again, bias towards the x axis. A much better
+                    approach would be to alternate the axis: (x,y,x,y,&hellip;)
+                    such that the 2i<sup>th</sup> level uses the x axis, while
+                    the 2i+1<sup>th</sup> level uses the y axis when sorting and
+                    splitting along the median. Such a tree is called a <w-b>k-d
+                    tree</w-b>.
+                </p>
+                <p>
+                    The image below shows what that a k-d tree would look like
+                    for the previous input. The median lines are, in order: red,
+                    blue, orange. Line orientation alternates. K-d trees aren't
+                    completely unbiased, as the initial order of the axes
+                    affects the final tree. In the right side of the below
+                    image, the axes are flipped so that the splitting starts
+                    with the y axis.
+                </p>
+                <img src="/assets/blog/0003/k_d_tree_proper_01.png" width="48%"/>
+                <img src="/assets/blog/0003/k_d_tree_proper_02.png" width="48%"/>
+                <p>
+                    While constructing a k-d tree can go on until a leaf node
+                    has exactly one element, such trees would be too deep and
+                    would require too many queries. The capacity hyperparameter
+                    c must be chosen and should be at least 2k, where k is
+                    the dimensionality of the k-d tree.
+                </p>
+                <p>
+                    Building a k-d tree can be done in O(nlogn logn). By
+                    pre-sorting along each of the k axes, this can be brought
+                    down to O(k nlogn). If a clever algorithm for finding the
+                    medians is used (without sorting), this can further be
+                    brought down to O(nlogn). Querying a single rectangle, in
+                    the worst case, is O(n), while in an ideal case it's
+                    O(logn+c).
+                </p>
+                <h3>Benchmarking</h3>
+                <p>
+                    The implementations described above are benchmarked using the following parameters:
+                </p>
+                <ul>
+                    <li>Algorithms</li>
+                    <li>Entity count</li>
+                    <li>Entity placement</li>
+                </ul>
+                <p>
+                    Entity count (i.e. the n) values were chosen to show
+                    degradation of performance but also spot any unusual cases
+                    for small n (for example n<sup>2</sup> behaves better than
+                    100n for small n but not in the general case).
+                </p>
+                <p>
+                    The way entities are placed, whether they form patterns,
+                    clusters, how uniform their distribution is etc. has helped
+                    us gain intuition behind using trees and various heuristics.
+                    Entity placement is also important in benchmarking, as
+                    certain algorithms and data structures make assumptions
+                    based on the aforementioned observations.
+                </p>
+                <ul>
+                    <li>
+                        <c-b>Random</c-b> - randomly place entities using a
+                        uniform distribution
+                    </li>
+                    <li>
+                        <c-b>RandomLargeBoxes</c-b> - same as above, but
+                        entities are orders of magnitude larger so overlap is
+                        greater
+                    </li>
+                    <li>
+                        <c-b>XLine</c-b> - entities are placed along a line
+                        centered on x=c,c=const., having large width variance
+                    </li>
+                    <li>
+                        <c-b>YLine</c-b> - entities are placed along a line
+                        centered on y=c,c=const., having large height variance
+                    </li>
+                    <li>
+                        <c-b>TrueUniform</c-b> - entities are placed uniformly
+                        along a rectangular grid, but their size slightly
+                        exceeds the grid cells to introduce overlap
+                    </li>
+                </ul>
+                <h3 id="benchmark-results">Results</h3>
+                <p>
+                    Below is a standard benchmark where the total time for a
+                    single frame is being measured (in ms). The reference values
+                    we are interested in are 33ms for 30 FPS and 16ms for 60
+                    FPS.
+                </p>
+                <img src="/assets/blog/0003/Random.png" width="48%"/>
+                <img src="/assets/blog/0003/RandomLargeBoxes.png" width="48%"/>
+                <br/>
+                <img src="/assets/blog/0003/XLine.png" width="48%"/>
+                <img src="/assets/blog/0003/YLine.png" width="48%"/>
+                <br/>
+                <img src="/assets/blog/0003/TrueUniform.png" width="48%"/>
+                <p>
+                    The first thing to notice is that for n&lt;500, the choice
+                    of which strategy to use doesn't matter all that much. If
+                    your game world can be subdivided into smaller rooms such
+                    that in a sinle frame only one room has collision checking,
+                    you can probably get away with not using any broad phase
+                    strategy.
+                </p>
+                <p>
+                    Obviously, we're more interested in how the lines behave as
+                    n&rarr;&infin;. The interesting thing (although not that
+                    surprising) is that Sweep and prune outperforms all other
+                    data structures, except for the XLine test. This last detail
+                    makes sense, as the variance along the x-axis in that test
+                    is very low, so sorting and pruning accomplishes nothing. On
+                    the other hand, Sweep and prune is extremely performant in
+                    the YLine test, where the x variance is large. Like we've
+                    discussed before, this irregular behavior can be remedied by
+                    checking which axis to use before the algorithm begins.
+                </p>
+                <p>
+                    A strange phenomenon is that the Quad tree performs much
+                    worse in YLine than in XLine, even though the quad tree is
+                    an unbiased data structure. I first thought it was because
+                    the test area is 800&times;600 pixels big, the entities
+                    would spread out more along the x axis which helped reduce
+                    overlap, especially because the entities are the same size
+                    with swapped axes in the two tests, so there would be
+                    greated overlap along the y axis. Even after using the same
+                    dimensions for both axes, the YLine test performed slightly
+                    worse (but way better than before). I'm not sure why this is
+                    the case yet, but it goes to show that the choice for
+                    hyperparameters is very important.
+                </p>
+                <p>
+                    R-trees have an unimpressive performance, especially the
+                    standard R-tree. Bulk-loading helps as it eliminates the
+                    need to reinsert nodes and keep the tree balanced. Amongst
+                    the bulk-loading strategies, X-sort has the least overhead
+                    and produces satisfactory results. The only exception is the
+                    XLine test, for the same reason as why Sort and sweep
+                    behaved poorly in that test; we can use the same tactic of
+                    deciding the axis before sorting to improve performance.
+                </p>
+                <p>
+                    K-d trees perform poorly because of the repeated sorting to
+                    find the mean. Like I've said, if we used a more clever but
+                    less percies method, this could improve build performance
+                    for the cost of query performance. In my experience, the
+                    median of medians algorithm does not behave nicely for this
+                    use case so I've omitted it from the benchmarks.
+                </p>
+                <hr/>
+                <p>
+                    There are a couple of remarks I want to make before
+                    finishing off.
+                </p>
+                <p>
+                    Firstly, the hyperparameters for all these strategies have
+                    been fixed throughout testing. A lot more research can be
+                    done on choosing these hyperparameter values based on a
+                    priori information like entity count and entity
+                    distribution. Whether this would improve the performance of
+                    trees still cannot be assessed, because of the following
+                    remark.
+                </p>
+                <p>
+                    Second, each iteration of this test runs for one single
+                    frame. If it were run multiple times, then the auxilliary
+                    data structures would have to get reconstructed each time.
+                    Since the entities are assumed to be static, that would be a
+                    waste of processing time. We could cache the data structures
+                    between frames, making use of the temporal coherence
+                    assumption where very little would change between two
+                    consecutive frames. In fact, this would be the best approach
+                    for a dynamic environment. Many of these data structures,
+                    especially R-trees and K-d trees, support inserting and
+                    removing elements which is in general cheaper than
+                    reconstructing the entire tree. Let's analyze how much time
+                    is spent building the data structure compared to the total
+                    time spent. The charts below plot out the behavior.
+                </p>
+                <img src="/assets/blog/0003/buildspaceRatioRandom.png" width="48%"/>
+                <img src="/assets/blog/0003/buildspaceRatioRandomLargeBoxes.png" width="48%"/>
+                <br/>
+                <img src="/assets/blog/0003/buildspaceRatioXLine.png" width="48%"/>
+                <img src="/assets/blog/0003/buildspaceRatioYLine.png" width="48%"/>
+                <br/>
+                <img src="/assets/blog/0003/buildspaceRatioTrueUniform.png" width="48%"/>
+                <p>
+                    A ratio of 0 is ideal and means that the entire processing
+                    time was spent on finding the collision candidates. The
+                    naive approach has no preprocessing so it achieves this
+                    ratio. All other structures perform some combination of
+                    sorting, hashing and building trees. Larger ratios are
+                    better, because if we can optimize those, then the total
+                    time will be much smaller. As we can see, R-trees have the
+                    most potential of being optimized through caching, while K-d
+                    trees are a close runner up.
+                </p>
+                <p>
+                    This however goes beyond the scope of this article, but I'd
+                    like to do a part 2 of this article focusing on this
+                    specific requirement where entities are dynamic. The
+                    important thing to note here is that there is much room for
+                    improvement.
+                </p>
+                <h3>Conclusion</h3>
+                <p>
+                    We've looked at several methods to reduce false positive
+                    collisions, most of them relying on spatial trees. All
+                    colliding objects have been abstracted as axis-aligned
+                    bounding boxes for simplicity. Much of the article focuses
+                    on building the intuition behind the approaches, explaining
+                    some of the math used to construct these geometric
+                    algorithms.
+                </p>
+                <p>
+                    Benchmarking has shown that the Sort and Sweep algorithm
+                    (also known as Sweep and Prune) performs the best even when
+                    there are thousands of overlapping objects. Furthermore,
+                    Sort and Sweep is much easier to implement than R-trees and
+                    K-d trees.
+                </p>
+                <p>
+                    The results of this article should be taken with a grain of
+                    salt: the choice of hyperparameters can greately affect the
+                    benchmarks. All entities are assumed to have been static, so
+                    a great deal of optimizations for dynamic environments
+                    haven't been considered.
+                </p>
             </m-body>
         </m-2col>
 
