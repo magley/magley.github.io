@@ -640,6 +640,187 @@
                     their shape and structure based on the objects' natural
                     measures, and that's what R-trees do.
                 </p>
+                <h3>R-tree</h3>
+                <p>
+                    <w-b>R-trees</w-b> are trees where a node can have up to B
+                    children (B is a hyperparameter). Each node represents a
+                    subsegment of the space, and areas can overlap (they can
+                    overlap in quad trees too, but only ancestor-child nodes).
+                    R-trees can span an arbitrary space, and they the nodes
+                    cover as much space as is needed, but not more.
+                </p>
+                <p>
+                    The principle of R-trees is similar to quad trees: insert
+                    objects to a node, split the node when object count
+                    overflows the capacity. Unlike quad trees, R-trees split
+                    unevenly, trying to make the new child nodes as small as
+                    possible.
+                </p>
+                <p>
+                    A split of an R-tree node is made by optimizing some
+                    measure, most commonly maximizing unused area:
+                </p>
+                <w-center>
+                    argmax(N<sub>1</sub>, N<sub>2</sub>) Area(N \ (N<sub>1</sub>
+                    &cup; N<sub>2</sub>))
+                </w-center>
+                <p>
+                    Take a look at the picture below. The leftmost image is an
+                    r-node (red outline) containing 5 objects. On the right are
+                    two different splits, labelled A and B, with their bounds
+                    highlighted in blue. In this example, the split AA would
+                    yield a larger unused area.
+                </p>
+                <img src="/assets/blog/0003/rtree_split.png" width="100%">
+                <p>
+                    The intuition behind this is that greater unused area means
+                    more compact bounding boxes for the two new nodes. If two
+                    objects are far apart, then the unused area between is
+                    greater. We've already established that the probability of
+                    intersection decreases as the objects get further and
+                    further apart. See the image below, the AA split is
+                    unnatural and leads to computation time wasted on cases
+                    which are visually obviously negative.
+                </p>
+                <p>
+                    Another thing I should point out is that we can
+                    maximize/minimize the perimiter of the rectangles instead of
+                    their areas. Think of a thin but extremely long rectangle.
+                    Its area may not be large, but the distance of two objects
+                    along the longer axis is large, then the algorithm will
+                    correctly split so that the two objects cannot intersect.
+                </p>
+                <img src="/assets/blog/0003/rtree_intuition.png" width="100%">
+                <p>
+                    Finding the area of a union of 2D rectangles is Klee's
+                    measure problem for the case d=2 which can be solved using
+                    Bentley's algorithm in O(nlogn). In fact, it can be shown
+                    that for d=2, the lower bound for a solution is
+                    &Omega;(nlogn).
+                </p>
+                <p>
+                    In general, there are 2<sup>2n&minus;1</sup>&minus;1
+                    possible ways to split an R-tree node containing nn
+                    elements, where each object can be put inside one or both
+                    nodes (the areas of child nodes can overlap).
+                </p>
+                <p>
+                    Finding the optimal split therefore has an upper bound of
+                    O(2<sup>n</sup>nlogn), which isn't practical for real use
+                    cases.
+                </p>
+                <p>
+                    In order to improve on this, we have to introduce
+                    approximations and heuristics. These optimizations often
+                    rely on choosing two seed objects as pivots for the new
+                    nodes, and then expanding the pivots for each remaining node
+                    based on the heuristic of minimal area expansion when
+                    inserting the object o:
+                </p>
+                <w-center>
+                    argmin(i&in;{1,2}) Area(N<sub>i</sub>&cup;o)
+                </w-center>
+                <p>
+                    The original paper on R-trees introduces three such splits:
+                </p>
+                <ul>
+                    <li>
+                        <w-b>Linear split</w-b>: On each axis, find the two
+                        objects furthest apart on that axis. Those two best
+                        objects are seeds. For every other object, greedily
+                        insert it into the seed with the minimal area expansion.
+                        Runs in O(nd) in dd dimensions.
+                    </li>
+                    <li>
+                        <w-b>Quadratic split</w-b>: Find the two objects with
+                        the maximum unused area:
+                        Area(N<sub>i</sub>&cup;N<sub>j</sub>) &minus;
+                        Area(N<sub>i</sub>) &minus; Area(N<sub>j</sub>). Those
+                        two best objects are seeds. For every other object,
+                        greedily insert it into the seed with the maximum unused
+                        area. Runs in O(n<sup>2</sup>).
+                    </li>
+                    <li>
+                        <w-b>Exponential split</w-b>: Same as quadratic split,
+                        but all O(2<sup>n</sup>) combinations are attempted.
+                    </li>
+                </ul>
+                <p>
+                    The main issue with these approximations is that they
+                    introduce overlap between nodes, which leads to degradation
+                    of performance. The bottleneck of R-trees is not
+                    construction, but querying. In general it is better to opt
+                    for a quadratic split which, while more costly to create,
+                    yields fewer false positives.
+                </p>
+                <p>
+                    Both the quadratic and linear split result in a large
+                    overlap. There exist variations of the R-tree that attempt
+                    to reduce this. For example, the R*-tree tries to minimize
+                    the nodes' area, perimiter and total overlap between
+                    siblings. Furthermore, it tries to evade splitting the node
+                    whenever possible by taking the f&in;[0,1] (usually 30%)
+                    furthest objects from the node's center and reinsert them
+                    starting from the root. This idea takes inspriation from how
+                    B-trees are balanced. R*-trees construction is far more
+                    costly, but it makes up for quicker amortized queries
+                    because of the reduced overlap. Unfortunately, R*-trees
+                    behave poorly for densly packed objects in a small space.
+                    Because R-trees are not unique (unless we split using the
+                    optimal approach for splitting nodes which isn't practical),
+                    the order in which objects are inserted can significantly
+                    impact performance.
+                </p>
+                <h3>Bulk R-tree</h3>
+                <p>
+                    Because we know our input data ahead of time, we can perform
+                    certain <w-b>bulk loading mechanisms</w-b> to preprocess the
+                    objects in such a way that the tree is more optimized.
+                </p>
+                <p>
+                    These mechanisms have us build the tree in a bottom-up
+                    procedure, which greatly simplifies the construction of an
+                    R-tree as we no longer have to split nodes and re-insert
+                    objects to keep the tree blanaced nor perform expensive
+                    heuristics to reduce overlap between nodes.
+                </p>
+                <p>
+                    The general idea behind all of these mechanisms is the same:
+                    leaves are built from objects which are locally close (per
+                    the distance metric d), upper level nodes are built using
+                    the same heuristics, the process repeats recursively until
+                    we are left with a level with a single node - the root. The
+                    heuristic in this case is an ordering function by which the
+                    objects are sorted.
+                </p>
+                <p>
+                    <w-b>Nearest-X</w-b> is a simple bulk-loading algorithm
+                    which sorts the objects on the x axis and groups objects
+                    into segments of size k. A new R-tree node is assigned to
+                    contain each group. The process repeats while kk is reduced
+                    in each upper level of the tree.
+                </p>
+                <p>
+                    Observe the following example. There is a scene with n=8
+                    objects in it, and we set the capacity to k=3 (top-left
+                    image). Assume the objects have been sorted by the x value
+                    of their centroid. The first k=3 objects will be grouped
+                    into the first leaf node, the second 3 objects into the
+                    second leaf node and the last remaining 2 objects into the
+                    third leaf node (top-right image, leaf node represented by a
+                    red rectangle). There are 3 leaves in the topmost layer in
+                    the tree so far, so we continue with the algorithm. Now n=3
+                    and k=max{n/k,2}=2 (kk mustn't be 1 to prevent infinite
+                    recursion). The first two leaves are grouped in the first
+                    new node, while the last leaf in the second node
+                    (bottom-left image, the new nodes are blue). There are 2
+                    nodes in the topmost layer in the tree so far, so we
+                    continue. n=2 and k=2. The two "blue" nodes are grouped
+                    together into a single new node of the new layer
+                    (bottom-right image, the new node is black). There's 1 node
+                    in the topmost level, so it has to be the root and the
+                    algorithm is finished.
+                </p>
             </m-body>
         </m-2col>
 
