@@ -1,15 +1,22 @@
 import os
 import shutil
-
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+from markupsafe import Markup
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from highlight_extension import HighlightExtension
 
-env = Environment(
-    loader=FileSystemLoader(["pages", "templates"]),
-    autoescape=select_autoescape(["html", "xml"])
-)
 
 PAGES_DIR = "pages"
 PUBLIC_DIR = ".public"
+
+
+env = Environment(
+    loader=FileSystemLoader(["pages", "templates"]),
+    autoescape=select_autoescape(["html", "xml"]),
+    extensions=[HighlightExtension],
+)
 
 
 def build_file(fname: str):
