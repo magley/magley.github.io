@@ -15,6 +15,22 @@
                 
                 <ul>
                     <li>
+                        {% with href='/blog/0003_broad_phase_algorithms.html', 
+                                title='Broad phase algorithms and data structures',
+                                description='Making collision detection faster',
+                                date='2026-02-26',
+                                tags='game dev, math, dsa'
+                        %}{% include 'blog-list-item.html' %}{% endwith %}
+                    </li>
+                    <li>
+                        {% with href='/blog/0002_immediate_mode_timer.html', 
+                                title='Immediate mode timer in games',
+                                description='A common and useful game dev pattern',
+                                date='2025-10-23',
+                                tags='game dev'
+                        %}{% include 'blog-list-item.html' %}{% endwith %}
+                    </li>
+                    <li>
                         {% with href='/blog/0001_uni_template.html', 
                                 title='LateX thesis template',
                                 description='A LaTeX template for univerity theses',
@@ -22,11 +38,7 @@
                                 tags='latex, writing'
                         %}{% include 'blog-list-item.html' %}{% endwith %}
                     </li>
-                    <li>
-                        
-                    </li>
                 </ul>
-
             </m-body>
         </m-2col>
 

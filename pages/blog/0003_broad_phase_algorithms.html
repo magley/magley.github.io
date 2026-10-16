@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        {{ define title "Broad phase algorithms and data structures" }}
-        {{ define description "Making collision detection faster" }}
-        {{ define tags "game dev, dsa" }}
-        {{ define date "2026-02-26" }}
-        {{ define lang "en" }}
-        
-        {{ import "./templates/head.html" }}
-        {{ import "./templates/blog-meta.html" }}
-        <link rel="stylesheet" href="/assets/pygmentize_sas.css" />
+        {% set title = "Broad phase algorithms and data structures" %}
+        {% set description = "Making collision detection faster" %}
+        {% set tags = "game dev, math, dsa" %}
+        {% set date = "2026-02-26" %}
+        {% set lang = "en" %}
+    
+        {% include 'head.html' %}
+        {% include 'blog-meta.html' %}
     </head>
 
     <body>
-        {{ import "./templates/header.html" }}
+        {% include 'header.html' %}
 
         <m-2col>
-            {{ import "./templates/sidebar.html" }}
+           {% include 'sidebar.html' %}
             
             <m-body>
-                {{ import "./templates/blog-heading.html" }}
+                {% include 'blog-heading.html' %}
                 
                 <p>
                     An important part of game engines and various geospatial
@@ -1275,6 +1274,6 @@
             </m-body>
         </m-2col>
 
-        {{ import "./templates/footer.html" }}
+        {% include 'footer.html' %}
     </body>
 </html>

@@ -22,7 +22,6 @@ env = Environment(
 def build_file(fname: str):
     template = env.get_template(fname)
     rendered: str = template.render()
-    print(rendered)
     return rendered
 
 
@@ -48,8 +47,6 @@ def build():
 
             print("Building", src_file, "at", src_path)
             built_file: str = build_file(src_path)
-
-            print(dest_path)
 
             with open(dest_path, 'w') as f:
                 f.write(built_file)
