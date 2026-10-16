@@ -2,10 +2,10 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-import build
+import builder
 
 
-DIRECTORY = build.PUBLIC_DIR
+DIRECTORY = builder.PUBLIC_DIR
 HOST = "localhost"
 PORT = 8000
 DIRECTORY_PATH = Path(DIRECTORY)
@@ -21,11 +21,11 @@ class FileChangeHandler(FileSystemEventHandler):
         if event.src_path.startswith(f".\\."):
             return
         print(":: Rebuilding")
-        build.build()
+        builder.build()
 
 
 if __name__ == "__main__":
-    build.build()
+    builder.build()
 
     observer = Observer()
 
