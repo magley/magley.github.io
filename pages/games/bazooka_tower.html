@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% set winSizeString = "6.35 MB" %}
+
+        {% include 'head.html' %}
+
+        <title>Bazooka Tower - Magley</title>
+
+
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <m-2col>
+            {% include 'sidebar.html' %}
+            
+            <m-body>
+                <a href="/games">&lt;&lt; Games</a>
+                <h2>Bazooka Tower</h2>
+
+                <img src="/assets/games/bazooka_tower/img/logo.png" alt="logo" width="{{ width }}" /><br/>
+
+                <!-- About -->
+                <p style="width: {{ width }}">
+                    <img src="/assets/games/bazooka_tower/img/header_about.png" alt="About" /><br/>
+
+                    <i>Climb the Everkneeler Tower and bring wrath to the scum living on its very top.</i>
+                    <br/>
+                    Bazooka Tower is an arcade-style shooter platformer.
+                    You play as Vincent Everkneeler,  making his way through the tower one floor at a time.
+                    <img src="/assets/games/bazooka_tower/img/player_run.gif" />
+                    Armed with your Infinity Bazooka, mow down dirtbags that stand in your way.
+                    <img src="/assets/games/bazooka_tower/img/bazooka.gif" />
+                    <br/>
+                    The tower is made up of rooms, and their layout is different on each playthrough. 
+                    You must defeat all the enemies in a room in order to advance to the next room.
+                    Be on the lookout for goodies dropped by your foes, like money you can spend at the shop,
+                    items that improve your firepower or provide a temporary effect, 
+                    health items, or powerful weapons with limited ammo.
+                    <img src="/assets/games/bazooka_tower/img/coin_gold.gif" />
+                    <img src="/assets/games/bazooka_tower/img/item_autofire.gif" />
+                    <img src="/assets/games/bazooka_tower/img/heart_item.gif" />
+                    <img src="/assets/games/bazooka_tower/img/plasma_blaster.gif" />
+                    <img src="/assets/games/bazooka_tower/img/flamethrower.gif" />
+                    <img src="/assets/games/bazooka_tower/img/laser_gun.gif" />
+                    <br/>
+                    The road to the top won't be without peril - you'll meet endless hazards and an army of thugs wanting
+                    nothing more than to see your demise. They can't be reasoned with: the only language they understand
+                    is violence, so give them a piece of your mind!
+                    <img src="/assets/games/bazooka_tower/img/red_walker.gif" />
+                    <img src="/assets/games/bazooka_tower/img/orange_walker.gif" />
+                    <img src="/assets/games/bazooka_tower/img/green_jumper.gif" />
+                    <img src="/assets/games/bazooka_tower/img/oil_flame.gif" />
+                    <img src="/assets/games/bazooka_tower/img/saw.gif" />
+                    <br/>
+                    <p>
+                        <w-b>Controls</w-b><br/>
+                        - <i>Move</i>: Arrow Keys<br/>
+                        - <i>Jump</i>: Z<br/>
+                        - <i>Shoot from bazooka</i>: X<br/>
+                        - <i>Shoot from secondary weapon</i>: C<br/>
+                    </p>
+                    <p>
+                        <hr/>
+                        Note: Bazooka Tower is in early alpha.
+                        <br/>
+                        Many features and assets have not been developed yet,
+                        and the game may be unstable or contain bugs.
+                        <hr/>
+                    </p>
+                </p>
+
+                <!-- Screenshots -->
+                <p>
+                    <img src="/assets/games/bazooka_tower/img/header_screenshots.png" alt="Screenshots" /><br/>
+
+                    <a target="_blank" href="/assets/games/bazooka_tower/img/screenshot1.png"><img src="/assets/games/bazooka_tower/img/screenshot1.png" width="380px" /></a>
+                    <a target="_blank" href="/assets/games/bazooka_tower/img/screenshot2.png"><img src="/assets/games/bazooka_tower/img/screenshot2.png" width="380px" /></a>
+                    <br/>
+                    <a target="_blank" href="/assets/games/bazooka_tower/img/screenshot3.png"><img src="/assets/games/bazooka_tower/img/screenshot3.png" width="380px" /></a>
+                    <a target="_blank" href="/assets/games/bazooka_tower/img/screenshot4.png"><img src="/assets/games/bazooka_tower/img/screenshot4.png" width="380px" /></a>
+                </p>
+
+                <!-- Downloads -->
+                <p>
+                    <img src="/assets/games/bazooka_tower/img/header_download.png" alt="Download" /><br/>
+                    The latest version is <w-b>0.1 alpha</w-b>.<br/>
+
+                    <img src="/assets/ico-windows.png">
+                    Windows 64bit <a href="/assets/games/bazooka_tower/bazooka-tower-0.1-alpha-windows-x86_64.7z">Download .7z ({{ winSizeString }})</a>
+                    <br/>
+                    <img src="/assets/ico-linux.png">
+                    Linux (coming soon)
+                </p>
+
+            </m-body>
+        </m-2col>
+
+        {% include 'footer.html' %}
+
+    </body>
+</html>
