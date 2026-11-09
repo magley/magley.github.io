@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include 'head.html' %}
+        <title>Software - Magley</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <m-2col>
+            {% include 'sidebar.html' %}
+            
+            <m-body>
+                <h2>Software</h2>
+                <p>
+                    Some of my apps and software I've built over the years.
+                    This list is not yet complete so stay tuned.
+                </p>
+
+                <div>
+                    <a href="duplicate_remover.html">
+                        <img src="/assets/software/duplicate_remover/img/header_smaller.png" alt="Duplicate Remover" width="75%"/>
+                    </a>
+                    <br/>
+                    <a href="duplicate_remover.html">Duplicate Remover</a>
+                    <br/>
+                    Fast and easy tool to discover and remove duplicate files from your computer.
+                </div>
+            </m-body>
+        </m-2col>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

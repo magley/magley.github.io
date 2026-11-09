@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% set winSizeString = "6.35 MB" %}
+        {% set webSizeString = "17 MB" %}
+        {% set width = "768px" %}
+        {% set height = "432px" %}
+
+        {% include 'head.html' %}
+
+        <title>Duplicate Remover - Magley</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <m-2col>
+            {% include 'sidebar.html' %}
+            
+            <m-body>
+                <a href="/software">&lt;&lt; Software</a>
+                <h2>Duplicate Remover</h2>
+
+                <img src="/assets/software/duplicate_remover/img/logo.png" alt="logo" width="75%" /><br/>
+
+                <!-- Introduction -->
+                <p>
+                    Do you know how many duplicate files there are on your computer? 
+                    </p>
+                <p>
+                    If you collect files like music, photographs and videos
+                    without using a specialized tool to manage and tag your
+                    files, you'll end up wasting space on duplicates. As the
+                    number of files you have grows, so does the number of
+                    duplicates - at an exponential rate.
+                    <br/>
+                    Well, not anymore! Duplicate Remover can find and delete these files for you.
+                </p>
+
+                <!-- Showcase -->
+                <p>
+                    It's as easy as <w-b>1-2-3</w-b>:
+                    <br/>
+
+                    <p>
+                        <w-b>1: Select the folder you want to scan</w-b>
+                        <br/>
+                        <a target="_blank" href="/assets/software/duplicate_remover/img/screenshot-step-1.png">
+                            <img src="/assets/software/duplicate_remover/img/screenshot-step-1.png" width="50%" />
+                        </a>
+                    </p>
+
+                    <p>
+                        <w-b>2: Begin scanning</w-b>
+                        <br/>
+                        <a target="_blank" href="/assets/software/duplicate_remover/img/screenshot-step-2.png">
+                            <img src="/assets/software/duplicate_remover/img/screenshot-step-2.png" width="50%" />
+                        </a>
+                    </p>
+
+                    <p>
+                        <w-b>3: Delete all the duplicate files</w-b>
+                        <br/>
+                        <a target="_blank" href="/assets/software/duplicate_remover/img/screenshot-step-3.png">
+                            <img src="/assets/software/duplicate_remover/img/screenshot-step-3.png" width="50%" />
+                        </a>
+                    </p>
+                </p>
+
+                <!-- Features -->
+                <p>
+                    <h3>Features</h3>
+
+                    <p>
+                        Duplicate Remover is <w-b>fast</w-b>.
+                        It uses the super-fast XXHash3 algorithm to compare files,
+                        makes use of multithreading and cleverly pre-hashes all files
+                        to reduce false positives.
+                    </p>
+
+                    <p>
+                        Duplicate Remover is <w-b>reliable</w-b>.
+                        Files are grouped into collision with 100% accuracy. You will
+                        never lose precious data when using Duplicate Remover.
+                    </p>
+
+                    <p>
+                        Duplicate Remover is <w-b>easy to use</w-b>.
+                        Remember: it's as easy as <w-b>1-2-3</w-b>.
+                        If you want to automate the process using scripts or CI/CD pipelines,
+                        there's a CLI version available too.
+                    </p>
+
+                    <p>
+                        Duplicate Remover is <w-b>cross-platform</w-b>.
+                        Powered by the IUP library, the GUI application works
+                        on Windows as well as Linux.
+                    </p>
+
+                    <p>
+                        Duplicate Remover is <w-b>open source</w-b>.
+                        Check out the
+                        <a href="https://github.com/magley/duplicate-remover">source code</a>.
+                    </p>
+                </p>
+
+                <!-- Screenshots -->
+                <p>
+                    <h3>Screenshots</h3>
+                    <a target="_blank" href="/assets/software/duplicate_remover/img/screenshot-gui.png">
+                        <img src="/assets/software/duplicate_remover/img/screenshot-gui.png" height="300px" />
+                    </a>
+                    <a target="_blank" href="/assets/software/duplicate_remover/img/screenshot-cli.png">
+                        <img src="/assets/software/duplicate_remover/img/screenshot-cli.png" height="300px" />
+                    </a>
+                </p>
+
+                <!-- Downloads -->
+                <p>
+                    <h3>Downloads</h3>
+                    The latest version is <w-b>0.3 alpha</w-b>.
+                    Duplicate Remover is in early development
+                    so you may come across stability issues.
+                    <br/>
+
+                    <img src="/assets/ico-windows.png">
+                    Windows 64bit
+                    <br/>
+                    <a href="https://github.com/magley/duplicate-remover/releases/download/0.3.0/duplicate-remover-gui_0.3.0_win_x64.zip">
+                        GUI - Download .zip (2.75 MB)</a>
+                    <br/>
+                    <a href="https://github.com/magley/duplicate-remover/releases/download/0.3.0/duplicate-remover-cli_0.3.0_win_x64.zip">
+                        CLI - Download .zip (611 KB)</a>
+                    <br/>
+
+                    <img src="/assets/ico-linux.png">
+                    Linux 64bit
+                    <br/>
+                    <a href="https://github.com/magley/duplicate-remover/releases/download/0.3.0/duplicate-remover-gui_0.3.0_linux_x64.tar.gz">
+                        GUI - Download .tar.gz (5.42 MB)</a> (not thoroughly tested)<br/>
+                    <a href="https://github.com/magley/duplicate-remover/releases/download/0.3.0/duplicate-remover-cli_0.3.0_linux_x64.tar.gz">
+                        CLI - Download .zip (1.09 MB )</a>
+                    <br/>
+                </p>
+
+            </m-body>
+        </m-2col>
+
+        {% include 'footer.html' %}
+    </body>
+</html>
